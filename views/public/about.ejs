@@ -6,6 +6,7 @@
       <% for (const p of h.paragraphs(company.about)) { %><p><%= p %></p><% } %>
     </div>
     <aside class="panel">
+      <img class="about-logo" src="/static/img/logo-full.png" alt="<%= company.company_name %> logo" width="218" height="180">
       <% const services = h.lines(company.services); if (services.length) { %>
         <h2 class="h3">Our services</h2>
         <ul class="checklist"><% for (const s of services) { %><li><%= s %></li><% } %></ul>

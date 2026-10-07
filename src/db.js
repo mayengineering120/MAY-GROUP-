@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS listings (
   description      TEXT NOT NULL DEFAULT '',
   location         TEXT NOT NULL DEFAULT '',
   price            REAL,
+  price_currency   TEXT NOT NULL DEFAULT 'AED',
   price_on_request INTEGER NOT NULL DEFAULT 0,
   make             TEXT NOT NULL DEFAULT '',
   model            TEXT NOT NULL DEFAULT '',
@@ -85,18 +86,28 @@ CREATE TABLE IF NOT EXISTS sessions (
 // Default company details, editable by admins from the staff portal.
 const DEFAULT_SETTINGS = {
   company_name: 'MAY Group',
-  tagline: 'Heavy machinery sales & construction projects you can rely on.',
+  subtitle: 'Musbah Al Yaqoot',
+  tagline: 'Engineering | Heavy Equipment | Machinery Trading',
   about:
-    'MAY Group supplies quality new and used machinery and delivers construction and development projects. ' +
+    'MAY Group (Musbah Al Yaqoot) is an engineering, heavy equipment and machinery trading company. ' +
+    'We supply quality new and used machinery and deliver engineering projects for our clients.\n\n' +
     'Edit this text from the staff portal under Company Details.',
-  services: 'Machinery sales\nEquipment sourcing\nConstruction projects\nProject development',
+  services: 'Engineering\nHeavy equipment\nMachinery trading\nEquipment sourcing',
   phone: '',
-  email: '',
+  email: 'musbahalyaqootengineering@gmail.com',
+  notify_email: 'musbahalyaqootengineering@gmail.com',
   address: '',
-  hours: 'Mon–Fri 8:00–17:00',
-  currency: '£',
-  registration: '',
+  hours: '',
+  default_currency: 'AED',
+  registration: 'SMC-Private Limited',
 };
+// Migrations for databases created by earlier versions.
+const listingCols = db.prepare('PRAGMA table_info(listings)').all().map((c) => c.name);
+if (!listingCols.includes('price_currency')) {
+  db.exec("ALTER TABLE listings ADD COLUMN price_currency TEXT NOT NULL DEFAULT 'AED'");
+}
+db.exec("DELETE FROM settings WHERE key = 'currency'");
+
 const insertSetting = db.prepare('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)');
 for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) insertSetting.run(key, value);
 

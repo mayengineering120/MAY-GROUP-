@@ -5,6 +5,8 @@ const { db, transaction } = require('./db');
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '..', 'uploads');
 fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 
+const { CURRENCIES } = require('./helpers');
+
 const STATUS_LABELS = {
   available: 'Available',
   under_offer: 'Under offer',
@@ -153,6 +155,7 @@ function fromForm(type, body) {
     description: str(body.description, 20000),
     location: str(body.location, 200),
     price: toPrice(body.price),
+    price_currency: CURRENCIES.includes(body.price_currency) ? body.price_currency : 'AED',
     price_on_request: body.price_on_request ? 1 : 0,
     make: str(body.make, 100),
     model: str(body.model, 100),
@@ -172,7 +175,7 @@ function fromForm(type, body) {
 
 const FIELDS = [
   'title', 'category', 'status', 'published', 'featured', 'summary', 'description', 'location', 'price',
-  'price_on_request', 'make', 'model', 'year', 'hours', 'condition', 'client', 'completed_on', 'internal_notes',
+  'price_currency', 'price_on_request', 'make', 'model', 'year', 'hours', 'condition', 'client', 'completed_on', 'internal_notes',
 ];
 
 function create(type, data, userId) {

@@ -27,7 +27,8 @@
       <h1><%= listing.title %></h1>
       <% if (listing.summary) { %><p class="lead"><%= listing.summary %></p><% } %>
       <% if (listing.type === 'machinery' || ['available', 'under_offer', 'sold'].includes(listing.status)) { %>
-        <p class="price<%= listing.status === 'sold' ? ' is-sold' : '' %>"><%= h.price(listing, company.currency) %></p>
+        <p class="price<%= listing.status === 'sold' ? ' is-sold' : '' %>"><%= h.price(listing) %></p>
+        <% if (h.priceAlt(listing)) { %><p class="price-alt"><%= h.priceAlt(listing) %></p><% } %>
       <% } %>
       <% if (listing.status === 'sold' && listing.sold_at) { %><p class="muted small">Sold <%= h.date(listing.sold_at) %></p><% } %>
       <dl class="specs">

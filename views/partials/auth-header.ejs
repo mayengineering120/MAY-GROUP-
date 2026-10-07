@@ -1,5 +1,5 @@
 <%- include('head') %>
 <body class="auth">
 <main id="main" class="auth-main">
-  <a class="brand" href="/"><span class="brand-mark" aria-hidden="true"><%= company.company_name.split(/\s+/).map(w => w[0]).join('').slice(0, 3).toUpperCase() %></span><span class="brand-name"><%= company.company_name %></span></a>
+  <a class="auth-logo" href="/"><img src="/static/img/logo-full.png" alt="<%= company.company_name %>" width="218" height="180"></a>
   <div class="auth-card">

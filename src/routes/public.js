@@ -3,6 +3,7 @@ const { db } = require('../db');
 const { verifyCsrf } = require('../auth');
 const L = require('../listings');
 const { listingUrl } = require('../helpers');
+const mailer = require('../mailer');
 
 const router = express.Router();
 const PER_PAGE = 12;
@@ -51,7 +52,7 @@ router.post('/contact', verifyCsrf, (req, res) => {
 
   const errors = [];
   if (!form.name) errors.push('Please enter your name.');
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errors.push('Please enter a valid email address.');
+  if (mailer.parseAddresses(form.email)[0] !== form.email) errors.push('Please enter a valid email address.');
   if (form.message.length < 5) errors.push('Please enter a message.');
   if (errors.length) {
     return res.status(400).render('public/contact', { title: 'Contact', form, errors, listing });
@@ -59,6 +60,8 @@ router.post('/contact', verifyCsrf, (req, res) => {
   db.prepare('INSERT INTO enquiries (listing_id, name, email, phone, message) VALUES (?, ?, ?, ?, ?)').run(
     listing?.id ?? null, form.name, form.email, form.phone, form.message,
   );
+  // Email the company inbox in the background; the enquiry is already saved either way.
+  mailer.sendEnquiryNotification(form, listing, listing ? listingUrl(listing) : null);
   req.session.flash = { type: 'success', text: 'Thank you, your enquiry has been sent. We will be in touch shortly.' };
   res.redirect(back);
 });

@@ -27,7 +27,7 @@
         <br><span class="small muted"><%= [l.category, l.location].filter(Boolean).join(' · ') %></span>
       </td>
       <td><span class="badge badge-inline badge-<%= l.status %>"><%= STATUS_LABELS[l.status] %></span></td>
-      <td><%= l.price_on_request || l.price == null ? 'POA' : `${company.currency}${h.number(l.price)}` %></td>
+      <td><%= l.price == null ? 'POA' : h.money(l.price, l.price_currency) %><% if (l.price != null && l.price_on_request) { %><br><span class="small muted">shown as POA</span><% } %></td>
       <td class="small"><%= h.date(l.updated_at) %></td>
       <td>
         <form method="post" action="/staff/<%= cfg.path %>/<%= l.id %>/status" class="inline">

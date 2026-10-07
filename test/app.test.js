@@ -9,6 +9,7 @@ const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'may-test-'));
 process.env.DATA_DIR = tmp;
 process.env.UPLOAD_DIR = path.join(tmp, 'uploads');
 process.env.SESSION_SECRET = 'test-secret';
+process.env.MAIL_TRANSPORT = 'json';
 
 const app = require('../server');
 let server;
@@ -74,7 +75,8 @@ test('admin edits company details shown on the public site', async () => {
   const _csrf = await admin.csrf('/staff/company');
   await admin.post('/staff/company', {
     _csrf, company_name: 'MAY Group', tagline: 'Built to last', about: 'We sell machines.', services: 'Sales',
-    phone: '+44 1234 567890', email: 'info@may.example', address: '1 Yard Lane', hours: '9-5', currency: '£', registration: '',
+    phone: '+971 4 000 0000', email: 'info@may.example', notify_email: 'sales@may.example, boss@may.example',
+    address: '1 Yard Lane', hours: '9-5', default_currency: 'AED', registration: '',
   });
   const about = await visitor.get('/about');
   assert.match(about.body, /We sell machines\./);
@@ -102,6 +104,7 @@ test('staff adds machinery with a photo; it appears publicly, escaped', async ()
   fd.append('category', 'Excavators');
   fd.append('status', 'available');
   fd.append('price', '45,000');
+  fd.append('price_currency', 'USD');
   fd.append('year', '2019');
   fd.append('hours', '5200');
   fd.append('internal_notes', 'Bought for 30k - secret');
@@ -114,7 +117,8 @@ test('staff adds machinery with a photo; it appears publicly, escaped', async ()
   const list = await visitor.get('/machinery');
   assert.match(list.body, /CAT 320 &lt;script&gt;/);
   assert.doesNotMatch(list.body, /<script>alert/);
-  assert.match(list.body, /£45,000/);
+  assert.match(list.body, /US\$ 45,000/);
+  assert.match(list.body, /≈ AED 165,263/); // 45,000 × 3.6725 peg
   const img = list.body.match(/\/uploads\/([\w-]+\.png)/)[1];
   assert.strictEqual((await visitor.get(`/uploads/${img}`)).status, 200);
 
@@ -159,6 +163,14 @@ test('visitor enquiries reach the staff inbox', async () => {
   const res = await visitor.post('/contact', { _csrf, name: 'Bob Buyer', email: 'bob@example.com', message: 'Do you have dumpers?' });
   assert.strictEqual(res.status, 302);
   const inbox = await staff.get('/staff/enquiries');
+  // ...and are emailed to the company's notification addresses, with Reply-To set to the customer.
+  const mailer = require('../src/mailer');
+  for (let i = 0; i < 50 && !mailer.outbox.length; i++) await new Promise((r) => setTimeout(r, 20));
+  const mail = mailer.outbox.at(-1);
+  assert.deepStrictEqual(mail.to.map((t) => t.address), ['sales@may.example', 'boss@may.example']);
+  assert.strictEqual(mail.replyTo[0].address, 'bob@example.com');
+  assert.match(mail.subject, /Bob Buyer/);
+  assert.match(mail.text, /Do you have dumpers\?/);
   assert.match(inbox.body, /Bob Buyer/);
   assert.match(inbox.body, /Do you have dumpers\?/);
 });

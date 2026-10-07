@@ -65,9 +65,14 @@
   <fieldset>
     <legend>Price</legend>
     <div class="field-row">
-      <label class="field">Price (<%= company.currency %>) <input name="price" inputmode="decimal" value="<%= listing.price ?? '' %>"></label>
+      <label class="field">Price <input name="price" inputmode="decimal" value="<%= listing.price ?? '' %>"></label>
+      <label class="field">Currency
+        <% const cur = listing.price_currency || company.default_currency || 'AED'; %>
+        <select name="price_currency"><% for (const c of h.CURRENCIES) { %><option value="<%= c %>"<%- c === cur ? ' selected' : '' %>><%= h.CURRENCY_LABELS[c] %></option><% } %></select>
+      </label>
       <label class="check"><input type="checkbox" name="price_on_request" value="1"<%- listing.price_on_request ? ' checked' : '' %>> Show “Price on request” instead</label>
     </div>
+    <p class="small muted">The website shows the price in both currencies, converting at the official peg of 1 US$ = <%= h.AED_PER_USD %> AED.</p>
   </fieldset>
 
   <fieldset id="photos">

@@ -1,7 +1,7 @@
 <%- include('../partials/header') %>
 <section class="hero">
   <div class="container hero-inner">
-    <p class="eyebrow"><%= company.company_name %></p>
+    <p class="eyebrow"><%= [company.company_name, company.subtitle].filter(Boolean).join(' · ') %></p>
     <h1><%= company.tagline %></h1>
     <div class="hero-actions">
       <a class="btn btn-primary" href="/machinery">Browse machinery</a>

@@ -1,5 +1,7 @@
 # MAY Group Website
 
+**MAY Group · Musbah Al Yaqoot**: Engineering | Heavy Equipment | Machinery Trading.
+
 The company website, with a secure staff portal for managing machinery and projects.
 
 ## What it does
@@ -9,7 +11,9 @@ The company website, with a secure staff portal for managing machinery and proje
 - **Machinery** listings with *Available / Sold / All* filters, search, categories and photo galleries
 - **Projects**: projects *for sale*, plus a portfolio of your *ongoing and completed* work
 - **About** and **Contact** pages, built from your company details
-- **Enquiry forms** on every listing and on the Contact page (with spam protection)
+- **Enquiry forms** on every listing and on the Contact page (with spam protection), **emailed to the company inbox**
+- **Prices in UAE dirhams and US dollars**: staff enter a price in either currency and the site shows both,
+  converted at the official peg (1 US$ = 3.6725 AED), e.g. *AED 250,000 ≈ US$ 68,074*
 
 **Staff portal** (`/staff`)
 - Secure logins with two roles:
@@ -38,6 +42,29 @@ Lost the admin password? From the server:
 ```bash
 npm run create-admin -- "Your Name" you@company.com "new-strong-password"
 ```
+
+## Receiving enquiries by email (Gmail)
+
+Every enquiry is saved in the staff portal **and** emailed to the addresses under
+*Staff portal → Company details → Enquiry email notifications*
+(default: `musbahalyaqootengineering@gmail.com`). The email's *Reply-To* is the customer,
+so pressing **Reply** in Gmail answers them directly.
+
+To switch sending on, Gmail needs an **App password** (Google doesn't allow the normal password):
+
+1. Sign in to the Gmail account and turn on **2-Step Verification** at https://myaccount.google.com/security
+2. Go to https://myaccount.google.com/apppasswords, create an app password named "Website", and copy the 16 characters
+3. On the server, set:
+   ```
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=465
+   SMTP_USER=musbahalyaqootengineering@gmail.com
+   SMTP_PASS=<the 16-character app password>
+   SITE_URL=https://www.your-domain.com
+   ```
+4. Restart the website. *Company details* will show **"Email sending is on"**. Send a test enquiry from the Contact page.
+
+Any other email provider works too, using its SMTP settings.
 
 ## Putting it online
 

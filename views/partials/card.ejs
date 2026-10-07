@@ -18,7 +18,7 @@
     </p>
     <% if (item.summary) { %><p class="card-summary"><%= item.summary %></p><% } %>
     <% if (item.type === 'machinery' || ['available', 'under_offer', 'sold'].includes(item.status)) { %>
-      <p class="card-price<%= item.status === 'sold' ? ' is-sold' : '' %>"><%= h.price(item, company.currency) %></p>
+      <p class="card-price<%= item.status === 'sold' ? ' is-sold' : '' %>"><%= h.price(item) %><% if (h.priceAlt(item)) { %> <span class="card-price-alt"><%= h.priceAlt(item) %></span><% } %></p>
     <% } %>
   </div>
 </a>

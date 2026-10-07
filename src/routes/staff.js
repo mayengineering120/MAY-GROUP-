@@ -4,6 +4,8 @@ const multer = require('multer');
 const { db, getSettings, saveSettings } = require('../db');
 const auth = require('../auth');
 const L = require('../listings');
+const mailer = require('../mailer');
+const { CURRENCIES } = require('../helpers');
 
 const router = express.Router();
 const { verifyCsrf, requireStaff, requireAdmin } = auth;
@@ -287,11 +289,15 @@ router.post('/account', verifyCsrf, (req, res) => {
 
 // ---------- Admin: company details ----------
 router.get('/company', requireAdmin, (req, res) => {
-  res.render('staff/company', { title: 'Company details', settings: getSettings() });
+  res.render('staff/company', { title: 'Company details', settings: getSettings(), mailConfigured: mailer.isConfigured() });
 });
 
 router.post('/company', requireAdmin, verifyCsrf, (req, res) => {
-  saveSettings(req.body);
+  const values = { ...req.body };
+  if (!CURRENCIES.includes(values.default_currency)) delete values.default_currency;
+  const emails = mailer.parseAddresses(values.notify_email);
+  values.notify_email = emails.join(', ');
+  saveSettings(values);
   flash(req, 'success', 'Company details saved. They now appear across the website.');
   res.redirect('/staff/company');
 });

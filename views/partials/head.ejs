@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><%= title ? `${title} | ${company.company_name}` : `${company.company_name} | ${company.tagline}` %></title>
   <meta name="description" content="<%= (typeof metaDescription !== 'undefined' && metaDescription) || company.tagline %>">
+  <link rel="icon" type="image/png" href="/static/img/favicon.png">
+  <meta name="theme-color" content="#0b2f52">
   <link rel="stylesheet" href="/static/css/style.css">
   <script src="/static/js/main.js" defer></script>
 </head>

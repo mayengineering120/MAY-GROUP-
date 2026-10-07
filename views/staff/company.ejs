@@ -5,7 +5,10 @@
   <input type="hidden" name="_csrf" value="<%= csrf() %>">
   <fieldset>
     <legend>Identity</legend>
-    <label class="field">Company name <input name="company_name" required maxlength="100" value="<%= settings.company_name %>"></label>
+    <div class="field-row">
+      <label class="field">Company name <input name="company_name" required maxlength="100" value="<%= settings.company_name %>"></label>
+      <label class="field">Trading / full name <span class="optional">(shown under the name)</span><input name="subtitle" maxlength="100" value="<%= settings.subtitle %>"></label>
+    </div>
     <label class="field">Tagline <span class="optional">(the headline on the home page)</span><input name="tagline" maxlength="200" value="<%= settings.tagline %>"></label>
     <label class="field">About the company <span class="optional">(leave a blank line between paragraphs)</span><textarea name="about" rows="8"><%= settings.about %></textarea></label>
     <label class="field">Services <span class="optional">(one per line)</span><textarea name="services" rows="5"><%= settings.services %></textarea></label>
@@ -14,15 +17,27 @@
     <legend>Contact</legend>
     <div class="field-row">
       <label class="field">Phone <input name="phone" maxlength="50" value="<%= settings.phone %>"></label>
-      <label class="field">Email <input name="email" type="email" maxlength="200" value="<%= settings.email %>"></label>
+      <label class="field">Public email <span class="optional">(shown on the website)</span><input name="email" type="email" maxlength="200" value="<%= settings.email %>"></label>
     </div>
     <label class="field">Address <input name="address" maxlength="300" value="<%= settings.address %>"></label>
     <label class="field">Opening hours <input name="hours" maxlength="200" value="<%= settings.hours %>"></label>
   </fieldset>
+  <fieldset id="email-notifications">
+    <legend>Enquiry email notifications</legend>
+    <label class="field">Send new website enquiries to <span class="optional">(separate several addresses with commas)</span>
+      <input name="notify_email" maxlength="500" value="<%= settings.notify_email %>"></label>
+    <% if (mailConfigured) { %>
+      <p class="small"><span class="badge badge-inline badge-available">Email sending is on</span> Every enquiry is emailed to the address above. Press Reply in your inbox to answer the customer directly.</p>
+    <% } else { %>
+      <div class="alert alert-warning small">Email sending is not switched on yet. Enquiries are still saved under <a href="/staff/enquiries">Enquiries</a>. To receive them by email, the person hosting the website must add the email settings (SMTP) described in the README.</div>
+    <% } %>
+  </fieldset>
   <fieldset>
     <legend>Other</legend>
     <div class="field-row">
-      <label class="field">Currency symbol <input name="currency" maxlength="5" value="<%= settings.currency %>"></label>
+      <label class="field">Default currency for new listings
+        <select name="default_currency"><% for (const c of h.CURRENCIES) { %><option value="<%= c %>"<%- c === settings.default_currency ? ' selected' : '' %>><%= h.CURRENCY_LABELS[c] %></option><% } %></select>
+      </label>
       <label class="field">Company registration / VAT <span class="optional">(shown in footer)</span><input name="registration" maxlength="200" value="<%= settings.registration %>"></label>
     </div>
   </fieldset>
