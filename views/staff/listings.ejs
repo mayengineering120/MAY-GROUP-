@@ -1,0 +1,51 @@
+<%- include('../partials/staff-header') %>
+<div class="page-title">
+  <h1><%= cfg.label %></h1>
+  <a class="btn btn-primary" href="/staff/<%= cfg.path %>/new">+ Add <%= cfg.singular.toLowerCase() %></a>
+</div>
+<form class="toolbar" method="get">
+  <input name="q" type="search" placeholder="Search…" value="<%= q %>" aria-label="Search">
+  <select name="status" aria-label="Status">
+    <option value="">All statuses</option>
+    <% for (const s of cfg.statuses) { %><option value="<%= s %>"<%- s === status ? ' selected' : '' %>><%= STATUS_LABELS[s] %></option><% } %>
+  </select>
+  <button class="btn" type="submit">Filter</button>
+</form>
+<p class="small muted"><%= total %> <%= total === 1 ? 'item' : 'items' %></p>
+<% if (listings.length) { %>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th></th><th>Title</th><th>Status</th><th>Price</th><th>Updated</th><th>Quick actions</th></tr></thead>
+  <tbody>
+  <% for (const l of listings) { %>
+    <tr>
+      <td class="thumb-cell"><% if (l.cover) { %><img src="/uploads/<%= l.cover %>" alt=""><% } %></td>
+      <td>
+        <a href="/staff/<%= cfg.path %>/<%= l.id %>/edit"><strong><%= l.title %></strong></a>
+        <% if (!l.published) { %><span class="tag">Draft</span><% } %>
+        <% if (l.featured) { %><span class="tag">Featured</span><% } %>
+        <br><span class="small muted"><%= [l.category, l.location].filter(Boolean).join(' · ') %></span>
+      </td>
+      <td><span class="badge badge-inline badge-<%= l.status %>"><%= STATUS_LABELS[l.status] %></span></td>
+      <td><%= l.price_on_request || l.price == null ? 'POA' : `${company.currency}${h.number(l.price)}` %></td>
+      <td class="small"><%= h.date(l.updated_at) %></td>
+      <td>
+        <form method="post" action="/staff/<%= cfg.path %>/<%= l.id %>/status" class="inline">
+          <input type="hidden" name="_csrf" value="<%= csrf() %>">
+          <% if (l.status !== 'sold') { %>
+            <button class="btn btn-small btn-sold" name="status" value="sold" type="submit">Mark sold</button>
+          <% } else { %>
+            <button class="btn btn-small" name="status" value="available" type="submit">Relist</button>
+          <% } %>
+        </form>
+        <% if (l.published) { %><a class="btn btn-small btn-ghost" href="<%= h.listingUrl(l) %>" target="_blank" rel="noopener">View</a><% } %>
+      </td>
+    </tr>
+  <% } %>
+  </tbody>
+</table>
+</div>
+<% } else { %>
+  <p class="empty">No <%= cfg.label.toLowerCase() %> found. <a href="/staff/<%= cfg.path %>/new">Add one now</a>.</p>
+<% } %>
+<%- include('../partials/staff-footer') %>

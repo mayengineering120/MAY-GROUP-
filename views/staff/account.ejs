@@ -1,0 +1,15 @@
+<%- include('../partials/staff-header') %>
+<h1>My account</h1>
+<div class="panel narrow-panel">
+  <dl class="details"><dt>Name</dt><dd><%= user.name %></dd><dt>Email</dt><dd><%= user.email %></dd><dt>Role</dt><dd><%= user.role === 'admin' ? 'Administrator' : 'Staff' %></dd></dl>
+</div>
+<h2 class="h3">Change password</h2>
+<%- include('../partials/errors') %>
+<form method="post" action="/staff/account" class="form narrow-panel">
+  <input type="hidden" name="_csrf" value="<%= csrf() %>">
+  <label class="field">Current password <input name="current_password" type="password" required autocomplete="current-password"></label>
+  <label class="field">New password <span class="optional">(at least 10 characters)</span><input name="new_password" type="password" required minlength="10" autocomplete="new-password"></label>
+  <label class="field">Confirm new password <input name="new_password_confirm" type="password" required minlength="10" autocomplete="new-password"></label>
+  <button class="btn btn-primary" type="submit">Change password</button>
+</form>
+<%- include('../partials/staff-footer') %>

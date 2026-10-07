@@ -1,0 +1,51 @@
+<%- include('../partials/staff-header') %>
+<h1>Staff accounts</h1>
+<p class="muted"><strong>Staff</strong> can add and edit listings, mark items sold and handle enquiries. <strong>Administrators</strong> can also delete listings, edit company details and manage staff accounts.</p>
+<div class="table-wrap">
+<table class="table">
+  <thead><tr><th>Name</th><th>Role</th><th>Status</th><th>Last login</th><th>Actions</th></tr></thead>
+  <tbody>
+  <% for (const u of users) { const self = u.id === user.id; %>
+    <tr class="<%= u.active ? '' : 'is-disabled' %>">
+      <td><strong><%= u.name %></strong><%= self ? ' (you)' : '' %><br><span class="small muted"><%= u.email %></span></td>
+      <td><%= u.role === 'admin' ? 'Administrator' : 'Staff' %></td>
+      <td><%= u.active ? 'Active' : 'Disabled' %></td>
+      <td class="small"><%= u.last_login_at ? h.date(u.last_login_at) : 'Never' %></td>
+      <td>
+        <form method="post" action="/staff/users/<%= u.id %>" class="inline">
+          <input type="hidden" name="_csrf" value="<%= csrf() %>">
+          <% if (!self) { %>
+            <% if (u.active) { %><button class="btn btn-small btn-danger" name="action" value="disable" data-confirm="Disable <%= u.name %>'s access? They will be logged out immediately.">Disable</button>
+            <% } else { %><button class="btn btn-small" name="action" value="enable">Enable</button><% } %>
+            <% if (u.role === 'admin') { %><button class="btn btn-small" name="action" value="make_staff">Make staff</button>
+            <% } else { %><button class="btn btn-small" name="action" value="make_admin" data-confirm="Give <%= u.name %> full administrator access?">Make admin</button><% } %>
+          <% } %>
+        </form>
+        <details class="inline-details">
+          <summary class="btn btn-small btn-ghost">Reset password</summary>
+          <form method="post" action="/staff/users/<%= u.id %>" class="inline">
+            <input type="hidden" name="_csrf" value="<%= csrf() %>"><input type="hidden" name="action" value="reset_password">
+            <input name="password" type="password" minlength="10" required placeholder="New password (10+ chars)" autocomplete="new-password" aria-label="New password">
+            <button class="btn btn-small btn-primary" type="submit">Set</button>
+          </form>
+        </details>
+      </td>
+    </tr>
+  <% } %>
+  </tbody>
+</table>
+</div>
+
+<h2 class="h3" id="add">Add a staff member</h2>
+<%- include('../partials/errors') %>
+<form method="post" action="/staff/users#add" class="form narrow-panel">
+  <input type="hidden" name="_csrf" value="<%= csrf() %>">
+  <label class="field">Full name <input name="name" required maxlength="100" value="<%= form.name || '' %>"></label>
+  <label class="field">Email <input name="email" type="email" required maxlength="200" value="<%= form.email || '' %>" autocomplete="off"></label>
+  <label class="field">Temporary password <span class="optional">(at least 10 characters; they can change it under My account)</span><input name="password" type="password" required minlength="10" autocomplete="new-password"></label>
+  <label class="field">Role
+    <select name="role"><option value="staff">Staff</option><option value="admin"<%- form.role === 'admin' ? ' selected' : '' %>>Administrator</option></select>
+  </label>
+  <button class="btn btn-primary" type="submit">Create account</button>
+</form>
+<%- include('../partials/staff-footer') %>

@@ -1,0 +1,40 @@
+<%- include('../partials/staff-header') %>
+<div class="page-title"><h1>Enquiries</h1></div>
+<nav class="tabs" aria-label="Filter">
+  <a href="/staff/enquiries"<%- show === 'open' ? ' aria-current="true"' : '' %>>Open</a>
+  <a href="/staff/enquiries?show=all"<%- show === 'all' ? ' aria-current="true"' : '' %>>All</a>
+</nav>
+<% if (!enquiries.length) { %><p class="empty"><%= show === 'open' ? 'No open enquiries. All caught up!' : 'No enquiries yet.' %></p><% } %>
+<div class="enquiries">
+<% for (const e of enquiries) { %>
+  <article class="panel enquiry<%= e.handled ? ' is-handled' : '' %>">
+    <header>
+      <div>
+        <strong><%= e.name %></strong>
+        <span class="small muted"><%= h.date(e.created_at) %></span>
+        <% if (e.handled) { %><span class="tag">Handled<%= e.handled_by_name ? ` by ${e.handled_by_name}` : '' %></span><% } %>
+      </div>
+      <div class="small">
+        <a href="mailto:<%= e.email %>?subject=<%= encodeURIComponent(`Re: your enquiry to ${company.company_name}`) %>"><%= e.email %></a>
+        <% if (e.phone) { %> · <a href="<%= h.telHref(e.phone) %>"><%= e.phone %></a><% } %>
+      </div>
+    </header>
+    <p class="small"><% if (e.listing_title) { %>Re: <a href="/staff/<%= TYPES[e.listing_type].path %>/<%= e.listing_id %>/edit"><%= e.listing_title %></a><% } else { %>General enquiry<% } %></p>
+    <p class="pre-line"><%= e.message %></p>
+    <div class="row-actions">
+      <form method="post" action="/staff/enquiries/<%= e.id %>/handled" class="inline">
+        <input type="hidden" name="_csrf" value="<%= csrf() %>"><input type="hidden" name="show" value="<%= show %>">
+        <input type="hidden" name="handled" value="<%= e.handled ? 0 : 1 %>">
+        <button class="btn btn-small<%= e.handled ? '' : ' btn-primary' %>" type="submit"><%= e.handled ? 'Reopen' : 'Mark handled' %></button>
+      </form>
+      <% if (user.role === 'admin') { %>
+        <form method="post" action="/staff/enquiries/<%= e.id %>/delete" class="inline">
+          <input type="hidden" name="_csrf" value="<%= csrf() %>">
+          <button class="btn btn-small btn-danger" type="submit" data-confirm="Delete this enquiry?">Delete</button>
+        </form>
+      <% } %>
+    </div>
+  </article>
+<% } %>
+</div>
+<%- include('../partials/staff-footer') %>

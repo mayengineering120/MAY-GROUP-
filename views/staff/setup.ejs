@@ -1,0 +1,13 @@
+<%- include('../partials/auth-header') %>
+<h1 class="h2">Welcome! Create the administrator account</h1>
+<p class="muted">This one-time setup creates the first administrator. You can add more staff afterwards.</p>
+<%- include('../partials/errors') %>
+<form method="post" action="/staff/setup" class="form">
+  <input type="hidden" name="_csrf" value="<%= csrf() %>">
+  <label class="field">Your name <input name="name" required value="<%= form.name || '' %>" autocomplete="name"></label>
+  <label class="field">Email <input name="email" type="email" required value="<%= form.email || '' %>" autocomplete="username"></label>
+  <label class="field">Password <span class="optional">(at least 10 characters)</span><input name="password" type="password" required minlength="10" autocomplete="new-password"></label>
+  <label class="field">Confirm password <input name="password_confirm" type="password" required minlength="10" autocomplete="new-password"></label>
+  <button class="btn btn-primary btn-block" type="submit">Create account</button>
+</form>
+<%- include('../partials/auth-footer') %>

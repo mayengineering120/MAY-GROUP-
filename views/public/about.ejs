@@ -1,0 +1,25 @@
+<%- include('../partials/header') %>
+<section class="page-head"><div class="container"><h1>About <%= company.company_name %></h1><p class="lead"><%= company.tagline %></p></div></section>
+<section class="section">
+  <div class="container split">
+    <div class="prose">
+      <% for (const p of h.paragraphs(company.about)) { %><p><%= p %></p><% } %>
+    </div>
+    <aside class="panel">
+      <% const services = h.lines(company.services); if (services.length) { %>
+        <h2 class="h3">Our services</h2>
+        <ul class="checklist"><% for (const s of services) { %><li><%= s %></li><% } %></ul>
+      <% } %>
+      <h2 class="h3">Company details</h2>
+      <dl class="details">
+        <% if (company.address) { %><dt>Address</dt><dd><%= company.address %></dd><% } %>
+        <% if (company.phone) { %><dt>Phone</dt><dd><a href="<%= h.telHref(company.phone) %>"><%= company.phone %></a></dd><% } %>
+        <% if (company.email) { %><dt>Email</dt><dd><a href="mailto:<%= company.email %>"><%= company.email %></a></dd><% } %>
+        <% if (company.hours) { %><dt>Opening hours</dt><dd><%= company.hours %></dd><% } %>
+        <% if (company.registration) { %><dt>Registration</dt><dd><%= company.registration %></dd><% } %>
+      </dl>
+      <a class="btn btn-primary" href="/contact">Contact us</a>
+    </aside>
+  </div>
+</section>
+<%- include('../partials/footer') %>

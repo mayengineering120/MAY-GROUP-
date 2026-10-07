@@ -1,0 +1,21 @@
+<%- include('head') %>
+<body class="staff">
+<header class="staff-top">
+  <a class="brand" href="/staff"><span class="brand-mark" aria-hidden="true"><%= company.company_name.split(/\s+/).map(w => w[0]).join('').slice(0, 3).toUpperCase() %></span><span class="brand-name">Staff portal</span></a>
+  <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="staff-nav">Menu</button>
+  <div class="staff-user small">
+    <a href="/" target="_blank" rel="noopener">View website ↗</a>
+    <span class="muted">Signed in as <a href="/staff/account"><%= user.name %></a> (<%= user.role %>)</span>
+    <form method="post" action="/staff/logout" class="inline"><input type="hidden" name="_csrf" value="<%= csrf() %>"><button class="link" type="submit">Log out</button></form>
+  </div>
+</header>
+<div class="staff-layout">
+  <nav id="staff-nav" class="staff-nav site-nav" aria-label="Staff">
+    <% const links = [['/staff', 'Dashboard'], ['/staff/machinery', 'Machinery'], ['/staff/projects', 'Projects'], ['/staff/enquiries', 'Enquiries'], ['/staff/account', 'My account']];
+       if (user.role === 'admin') links.push(['/staff/company', 'Company details'], ['/staff/users', 'Staff accounts']); %>
+    <% for (const [href, label] of links) { const active = href === '/staff' ? (path === '/staff' || path === '/staff/') : path.startsWith(href); %>
+      <a href="<%= href %>"<%- active ? ' aria-current="page"' : '' %>><%= label %></a>
+    <% } %>
+  </nav>
+  <main id="main" class="staff-main">
+    <%- include('flash') %>

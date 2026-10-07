@@ -1,0 +1,24 @@
+<a class="card" href="<%= h.listingUrl(item) %>">
+  <div class="card-media">
+    <% if (item.cover) { %>
+      <img src="/uploads/<%= item.cover %>" alt="" loading="lazy">
+    <% } else { %>
+      <div class="placeholder" aria-hidden="true"><%= item.type === 'machinery' ? 'No photo yet' : 'Project' %></div>
+    <% } %>
+    <span class="badge badge-<%= item.status %>"><%= STATUS_LABELS[item.status] %></span>
+  </div>
+  <div class="card-body">
+    <h3 class="card-title"><%= item.title %></h3>
+    <p class="card-meta">
+      <% if (item.type === 'machinery') { %>
+        <%= [item.year, item.make, item.hours != null ? `${h.number(item.hours)} hrs` : null].filter(Boolean).join(' · ') %>
+      <% } else { %>
+        <%= [item.category, item.location].filter(Boolean).join(' · ') %>
+      <% } %>
+    </p>
+    <% if (item.summary) { %><p class="card-summary"><%= item.summary %></p><% } %>
+    <% if (item.type === 'machinery' || ['available', 'under_offer', 'sold'].includes(item.status)) { %>
+      <p class="card-price<%= item.status === 'sold' ? ' is-sold' : '' %>"><%= h.price(item, company.currency) %></p>
+    <% } %>
+  </div>
+</a>

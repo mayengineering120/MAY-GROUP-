@@ -1,0 +1,70 @@
+<%- include('../partials/header', { metaDescription: listing.summary }) %>
+<div class="container">
+  <nav class="crumbs small" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/<%= cfg.path %>"><%= cfg.label %></a> / <span><%= listing.title %></span></nav>
+  <% if (!listing.published) { %><div class="alert alert-warning">This listing is a draft and is only visible to staff.</div><% } %>
+  <% if (user) { %><p class="staff-edit"><a class="btn btn-small" href="/staff/<%= cfg.path %>/<%= listing.id %>/edit">Edit in staff portal</a></p><% } %>
+</div>
+<section class="section section-tight">
+  <div class="container detail">
+    <div class="gallery" data-gallery>
+      <% if (images.length) { %>
+        <div class="gallery-main">
+          <img src="/uploads/<%= images[0].filename %>" alt="<%= listing.title %>" data-gallery-main>
+          <span class="badge badge-<%= listing.status %>"><%= STATUS_LABELS[listing.status] %></span>
+        </div>
+        <% if (images.length > 1) { %>
+          <div class="thumbs">
+            <% images.forEach((img, i) => { %>
+              <button type="button" data-src="/uploads/<%= img.filename %>"<%- i === 0 ? ' aria-current="true"' : '' %> aria-label="Show photo <%= i + 1 %>"><img src="/uploads/<%= img.filename %>" alt="" loading="lazy"></button>
+            <% }) %>
+          </div>
+        <% } %>
+      <% } else { %>
+        <div class="gallery-main"><div class="placeholder">No photos yet</div><span class="badge badge-<%= listing.status %>"><%= STATUS_LABELS[listing.status] %></span></div>
+      <% } %>
+    </div>
+    <div class="detail-info">
+      <h1><%= listing.title %></h1>
+      <% if (listing.summary) { %><p class="lead"><%= listing.summary %></p><% } %>
+      <% if (listing.type === 'machinery' || ['available', 'under_offer', 'sold'].includes(listing.status)) { %>
+        <p class="price<%= listing.status === 'sold' ? ' is-sold' : '' %>"><%= h.price(listing, company.currency) %></p>
+      <% } %>
+      <% if (listing.status === 'sold' && listing.sold_at) { %><p class="muted small">Sold <%= h.date(listing.sold_at) %></p><% } %>
+      <dl class="specs">
+        <% const specs = listing.type === 'machinery'
+          ? [['Category', listing.category], ['Make', listing.make], ['Model', listing.model], ['Year', listing.year], ['Hours', listing.hours != null ? h.number(listing.hours) : ''], ['Condition', listing.condition], ['Location', listing.location]]
+          : [['Category', listing.category], ['Client', listing.client], ['Location', listing.location], ['Completed', listing.completed_on], ['Status', STATUS_LABELS[listing.status]]]; %>
+        <% for (const [k, v] of specs) { if (v === null || v === undefined || v === '') continue; %>
+          <div><dt><%= k %></dt><dd><%= v %></dd></div>
+        <% } %>
+      </dl>
+      <% if (listing.status !== 'sold') { %>
+        <a class="btn btn-primary" href="#enquire">Enquire about this <%= cfg.singular.toLowerCase() %></a>
+        <% if (company.phone) { %><a class="btn btn-ghost" href="<%= h.telHref(company.phone) %>">Call <%= company.phone %></a><% } %>
+      <% } %>
+    </div>
+  </div>
+</section>
+<% if (listing.description) { %>
+<section class="section section-tight">
+  <div class="container prose narrow">
+    <h2>Description</h2>
+    <% for (const p of h.paragraphs(listing.description)) { %><p class="pre-line"><%= p %></p><% } %>
+  </div>
+</section>
+<% } %>
+<section class="section section-alt" id="enquire">
+  <div class="container narrow">
+    <h2><%= listing.status === 'sold' ? 'Looking for something similar?' : 'Enquire' %></h2>
+    <%- include('../partials/enquiry-form', { listing, form: {} }) %>
+  </div>
+</section>
+<% if (related.length) { %>
+<section class="section">
+  <div class="container">
+    <h2>You might also like</h2>
+    <div class="grid"><% for (const item of related) { %><%- include('../partials/card', { item }) %><% } %></div>
+  </div>
+</section>
+<% } %>
+<%- include('../partials/footer') %>

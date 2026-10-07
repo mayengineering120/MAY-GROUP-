@@ -1,0 +1,14 @@
+<form method="post" action="/contact" class="form">
+  <input type="hidden" name="_csrf" value="<%= csrf() %>">
+  <% if (listing) { %><input type="hidden" name="listing_id" value="<%= listing.id %>"><% } %>
+  <div class="hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
+  <div class="field-row">
+    <label class="field">Your name <input name="name" required maxlength="200" autocomplete="name" value="<%= form.name || '' %>"></label>
+    <label class="field">Phone <span class="optional">(optional)</span> <input name="phone" type="tel" maxlength="50" autocomplete="tel" value="<%= form.phone || '' %>"></label>
+  </div>
+  <label class="field">Email <input name="email" type="email" required maxlength="200" autocomplete="email" value="<%= form.email || '' %>"></label>
+  <label class="field">Message
+    <textarea name="message" rows="5" required maxlength="5000"><%= form.message || (listing ? `Hello, I'm interested in "${listing.title}". Please send me more details.` : '') %></textarea>
+  </label>
+  <button class="btn btn-primary" type="submit">Send enquiry</button>
+</form>

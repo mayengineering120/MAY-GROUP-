@@ -1,0 +1,23 @@
+<%- include('../partials/header') %>
+<section class="page-head"><div class="container"><h1>Contact us</h1><p class="lead">Questions about a machine, a project or anything else? Send us a message.</p></div></section>
+<section class="section">
+  <div class="container split">
+    <div>
+      <% if (errors.length) { %>
+        <div class="alert alert-error" role="alert"><ul><% for (const e of errors) { %><li><%= e %></li><% } %></ul></div>
+      <% } %>
+      <% if (listing) { %><p>Enquiry about: <a href="<%= h.listingUrl(listing) %>"><%= listing.title %></a></p><% } %>
+      <%- include('../partials/enquiry-form', { listing, form }) %>
+    </div>
+    <aside class="panel">
+      <h2 class="h3"><%= company.company_name %></h2>
+      <dl class="details">
+        <% if (company.phone) { %><dt>Phone</dt><dd><a href="<%= h.telHref(company.phone) %>"><%= company.phone %></a></dd><% } %>
+        <% if (company.email) { %><dt>Email</dt><dd><a href="mailto:<%= company.email %>"><%= company.email %></a></dd><% } %>
+        <% if (company.address) { %><dt>Address</dt><dd><%= company.address %></dd><% } %>
+        <% if (company.hours) { %><dt>Opening hours</dt><dd><%= company.hours %></dd><% } %>
+      </dl>
+    </aside>
+  </div>
+</section>
+<%- include('../partials/footer') %>

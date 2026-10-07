@@ -1,0 +1,44 @@
+<%- include('../partials/header') %>
+<section class="page-head">
+  <div class="container">
+    <h1><%= cfg.label %></h1>
+    <p class="lead"><%= cfg.key === 'machinery' ? 'Quality machinery ready to work. Browse what is available now, or see what we have recently sold.' : 'Projects available for sale, and a look at the work we have delivered.' %></p>
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <nav class="tabs" aria-label="Filter by status">
+      <% for (const f of filters) { %>
+        <a href="?status=<%= f.key %>"<%- f.key === filter.key ? ' aria-current="true"' : '' %>><%= f.label %></a>
+      <% } %>
+    </nav>
+    <form class="toolbar" method="get">
+      <input type="hidden" name="status" value="<%= filter.key %>">
+      <label class="sr-only" for="q">Search</label>
+      <input id="q" name="q" type="search" placeholder="Search <%= cfg.label.toLowerCase() %>…" value="<%= q %>">
+      <% if (categories.length) { %>
+        <label class="sr-only" for="category">Category</label>
+        <select id="category" name="category">
+          <option value="">All categories</option>
+          <% for (const c of categories) { %><option<%- c === category ? ' selected' : '' %>><%= c %></option><% } %>
+        </select>
+      <% } %>
+      <button class="btn" type="submit">Search</button>
+    </form>
+    <p class="muted small"><%= total %> <%= total === 1 ? 'result' : 'results' %></p>
+    <% if (listings.length) { %>
+      <div class="grid"><% for (const item of listings) { %><%- include('../partials/card', { item }) %><% } %></div>
+    <% } else { %>
+      <p class="empty">Nothing here right now. <a href="/contact">Contact us</a> and we'll let you know when something comes in.</p>
+    <% } %>
+    <% if (pages > 1) { %>
+      <nav class="pager" aria-label="Pages">
+        <% const qs = (p) => new URLSearchParams({ status: filter.key, q, category, page: p }).toString(); %>
+        <% if (page > 1) { %><a href="?<%= qs(page - 1) %>">&larr; Previous</a><% } %>
+        <span>Page <%= page %> of <%= pages %></span>
+        <% if (page < pages) { %><a href="?<%= qs(page + 1) %>">Next &rarr;</a><% } %>
+      </nav>
+    <% } %>
+  </div>
+</section>
+<%- include('../partials/footer') %>

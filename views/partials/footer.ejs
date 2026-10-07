@@ -1,0 +1,34 @@
+</main>
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>
+      <p class="footer-brand"><%= company.company_name %></p>
+      <p class="muted"><%= company.tagline %></p>
+      <% if (company.registration) { %><p class="small muted"><%= company.registration %></p><% } %>
+    </div>
+    <div>
+      <p class="footer-heading">Explore</p>
+      <ul class="plain">
+        <li><a href="/machinery">Machinery for sale</a></li>
+        <li><a href="/machinery?status=sold">Recently sold</a></li>
+        <li><a href="/projects">Projects</a></li>
+        <li><a href="/about">About us</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-heading">Contact</p>
+      <ul class="plain">
+        <% if (company.phone) { %><li><a href="<%= h.telHref(company.phone) %>"><%= company.phone %></a></li><% } %>
+        <% if (company.email) { %><li><a href="mailto:<%= company.email %>"><%= company.email %></a></li><% } %>
+        <% if (company.address) { %><li class="muted"><%= company.address %></li><% } %>
+        <% if (company.hours) { %><li class="muted"><%= company.hours %></li><% } %>
+      </ul>
+    </div>
+  </div>
+  <div class="container footer-bottom small muted">
+    <span>&copy; <%= new Date().getFullYear() %> <%= company.company_name %>. All rights reserved.</span>
+    <a href="/staff">Staff login</a>
+  </div>
+</footer>
+</body>
+</html>

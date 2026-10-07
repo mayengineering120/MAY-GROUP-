@@ -1,0 +1,45 @@
+<%- include('../partials/staff-header') %>
+<h1>Hello, <%= user.name.split(' ')[0] %></h1>
+<div class="tiles">
+  <% for (const cfg of Object.values(TYPES)) { const c = byType[cfg.key] || {}; %>
+    <a class="tile" href="/staff/<%= cfg.path %>">
+      <span class="tile-label"><%= cfg.label %></span>
+      <span class="tile-value"><%= c.available || 0 %> <small>available</small></span>
+      <span class="small muted"><%= c.sold || 0 %> sold · <%= c.drafts || 0 %> drafts · <%= c.total || 0 %> total</span>
+    </a>
+  <% } %>
+  <a class="tile<%= openEnquiries ? ' tile-alert' : '' %>" href="/staff/enquiries">
+    <span class="tile-label">Open enquiries</span>
+    <span class="tile-value"><%= openEnquiries %></span>
+    <span class="small muted">waiting for a reply</span>
+  </a>
+</div>
+<div class="quick-actions">
+  <a class="btn btn-primary" href="/staff/machinery/new">+ Add machinery</a>
+  <a class="btn btn-primary" href="/staff/projects/new">+ Add project</a>
+</div>
+<div class="two-col">
+  <section class="panel">
+    <h2 class="h3">Latest open enquiries</h2>
+    <% if (!enquiries.length) { %><p class="muted">No open enquiries. 🎉</p><% } %>
+    <ul class="plain list-divided">
+      <% for (const e of enquiries) { %>
+        <li><strong><%= e.name %></strong> <span class="muted small"><%= h.date(e.created_at) %></span><br>
+          <span class="small"><%= e.listing_title ? `Re: ${e.listing_title}` : 'General enquiry' %></span></li>
+      <% } %>
+    </ul>
+    <a href="/staff/enquiries">All enquiries &rarr;</a>
+  </section>
+  <section class="panel">
+    <h2 class="h3">Recently updated</h2>
+    <ul class="plain list-divided">
+      <% for (const l of recent) { %>
+        <li><a href="/staff/<%= TYPES[l.type].path %>/<%= l.id %>/edit"><%= l.title %></a>
+          <span class="badge badge-inline badge-<%= l.status %>"><%= STATUS_LABELS[l.status] %></span>
+          <br><span class="small muted"><%= h.date(l.updated_at) %><%= l.updated_by_name ? ` by ${l.updated_by_name}` : '' %></span></li>
+      <% } %>
+    </ul>
+    <% if (!recent.length) { %><p class="muted">Nothing listed yet. Add your first machine or project above.</p><% } %>
+  </section>
+</div>
+<%- include('../partials/staff-footer') %>

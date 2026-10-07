@@ -1,0 +1,128 @@
+<%- include('../partials/staff-header') %>
+<% const isNew = !listing.id; const action = isNew ? `/staff/${cfg.path}` : `/staff/${cfg.path}/${listing.id}`; %>
+<div class="page-title">
+  <h1><%= title %></h1>
+  <% if (!isNew && listing.published) { %><a class="btn btn-ghost" href="<%= h.listingUrl(listing) %>" target="_blank" rel="noopener">View on website ↗</a><% } %>
+</div>
+<p class="small"><a href="/staff/<%= cfg.path %>">&larr; Back to <%= cfg.label.toLowerCase() %></a></p>
+<%- include('../partials/errors') %>
+
+<% if (!isNew) { %>
+<div class="status-bar panel">
+  <span>Status: <span class="badge badge-inline badge-<%= listing.status %>"><%= STATUS_LABELS[listing.status] %></span>
+    <% if (listing.sold_at) { %><span class="small muted">sold <%= h.date(listing.sold_at) %></span><% } %></span>
+  <form method="post" action="/staff/<%= cfg.path %>/<%= listing.id %>/status" class="inline">
+    <input type="hidden" name="_csrf" value="<%= csrf() %>"><input type="hidden" name="back" value="edit">
+    <% for (const s of cfg.statuses) { if (s === listing.status) continue; %>
+      <button class="btn btn-small<%= s === 'sold' ? ' btn-sold' : '' %>" name="status" value="<%= s %>" type="submit">Mark <%= STATUS_LABELS[s].toLowerCase() %></button>
+    <% } %>
+  </form>
+</div>
+<% } %>
+
+<form method="post" action="<%= action %>" enctype="multipart/form-data" class="form form-wide">
+  <input type="hidden" name="_csrf" value="<%= csrf() %>">
+  <fieldset>
+    <legend>Main details</legend>
+    <label class="field">Title <input name="title" required maxlength="200" value="<%= listing.title || '' %>" placeholder="<%= cfg.key === 'machinery' ? 'e.g. Caterpillar 320 Excavator' : 'e.g. Riverside Business Park, Phase 2' %>"></label>
+    <div class="field-row">
+      <label class="field">Category
+        <input name="category" maxlength="100" list="category-list" value="<%= listing.category || '' %>" placeholder="<%= cfg.key === 'machinery' ? 'e.g. Excavators' : 'e.g. Commercial' %>">
+        <datalist id="category-list"><% for (const c of categories) { %><option value="<%= c %>"><% } %></datalist>
+      </label>
+      <label class="field">Status
+        <select name="status"><% for (const s of cfg.statuses) { %><option value="<%= s %>"<%- s === listing.status ? ' selected' : '' %>><%= STATUS_LABELS[s] %></option><% } %></select>
+      </label>
+    </div>
+    <label class="field">Short summary <span class="optional">(shown on listing cards)</span><input name="summary" maxlength="300" value="<%= listing.summary || '' %>"></label>
+    <label class="field">Full description <textarea name="description" rows="8" maxlength="20000"><%= listing.description || '' %></textarea></label>
+    <label class="field">Location <input name="location" maxlength="200" value="<%= listing.location || '' %>"></label>
+  </fieldset>
+
+  <% if (cfg.key === 'machinery') { %>
+  <fieldset>
+    <legend>Machine specifications</legend>
+    <div class="field-row">
+      <label class="field">Make <input name="make" maxlength="100" value="<%= listing.make || '' %>"></label>
+      <label class="field">Model <input name="model" maxlength="100" value="<%= listing.model || '' %>"></label>
+    </div>
+    <div class="field-row">
+      <label class="field">Year <input name="year" inputmode="numeric" maxlength="4" value="<%= listing.year ?? '' %>"></label>
+      <label class="field">Hours <input name="hours" inputmode="numeric" value="<%= listing.hours ?? '' %>"></label>
+      <label class="field">Condition <input name="condition" maxlength="100" value="<%= listing.condition || '' %>" placeholder="e.g. Excellent, Used, Refurbished"></label>
+    </div>
+  </fieldset>
+  <% } else { %>
+  <fieldset>
+    <legend>Project details</legend>
+    <div class="field-row">
+      <label class="field">Client <span class="optional">(optional)</span><input name="client" maxlength="200" value="<%= listing.client || '' %>"></label>
+      <label class="field">Completed <span class="optional">(e.g. March 2026)</span><input name="completed_on" maxlength="50" value="<%= listing.completed_on || '' %>"></label>
+    </div>
+  </fieldset>
+  <% } %>
+
+  <fieldset>
+    <legend>Price</legend>
+    <div class="field-row">
+      <label class="field">Price (<%= company.currency %>) <input name="price" inputmode="decimal" value="<%= listing.price ?? '' %>"></label>
+      <label class="check"><input type="checkbox" name="price_on_request" value="1"<%- listing.price_on_request ? ' checked' : '' %>> Show “Price on request” instead</label>
+    </div>
+  </fieldset>
+
+  <fieldset id="photos">
+    <legend>Photos</legend>
+    <% if (images.length) { %>
+      <p class="small muted">The first photo is the cover shown in listings.</p>
+      <div class="photo-grid">
+        <% images.forEach((img, i) => { %>
+          <div class="photo">
+            <img src="/uploads/<%= img.filename %>" alt="">
+            <% if (i === 0) { %><span class="tag">Cover</span><% } %>
+            <div class="photo-actions">
+              <% if (i !== 0) { %><button class="btn btn-small" type="submit" form="cover-<%= img.id %>">Make cover</button><% } %>
+              <button class="btn btn-small btn-danger" type="submit" form="del-img-<%= img.id %>" data-confirm="Remove this photo?">Remove</button>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+    <label class="field">Add photos <span class="optional">(JPG, PNG, WebP or GIF, up to 8 MB each, you can select several)</span>
+      <input type="file" name="photos" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
+    </label>
+  </fieldset>
+
+  <fieldset>
+    <legend>Visibility</legend>
+    <label class="check"><input type="checkbox" name="published" value="1"<%- listing.published ? ' checked' : '' %>> Published (visible on the website)</label>
+    <label class="check"><input type="checkbox" name="featured" value="1"<%- listing.featured ? ' checked' : '' %>> Featured (shown first)</label>
+  </fieldset>
+
+  <fieldset class="internal">
+    <legend>Internal notes <span class="optional">(staff only, never shown publicly)</span></legend>
+    <textarea name="internal_notes" rows="4" maxlength="10000" aria-label="Internal notes" placeholder="e.g. Purchase price, seller contact, service history, buyer details…"><%= listing.internal_notes || '' %></textarea>
+  </fieldset>
+
+  <div class="form-actions">
+    <button class="btn btn-primary" type="submit"><%= isNew ? `Add ${cfg.singular.toLowerCase()}` : 'Save changes' %></button>
+    <a class="btn btn-ghost" href="/staff/<%= cfg.path %>">Cancel</a>
+  </div>
+</form>
+
+<% if (!isNew) { %>
+  <% for (const img of images) { %>
+    <form id="del-img-<%= img.id %>" method="post" action="/staff/<%= cfg.path %>/<%= listing.id %>/images/<%= img.id %>/delete" hidden><input type="hidden" name="_csrf" value="<%= csrf() %>"></form>
+    <form id="cover-<%= img.id %>" method="post" action="/staff/<%= cfg.path %>/<%= listing.id %>/images/<%= img.id %>/cover" hidden><input type="hidden" name="_csrf" value="<%= csrf() %>"></form>
+  <% } %>
+  <% if (user.role === 'admin') { %>
+    <section class="panel danger-zone">
+      <h2 class="h3">Delete this <%= cfg.singular.toLowerCase() %></h2>
+      <p class="small muted">This permanently removes the listing and its photos. To keep a record, mark it as sold or unpublish it instead.</p>
+      <form method="post" action="/staff/<%= cfg.path %>/<%= listing.id %>/delete">
+        <input type="hidden" name="_csrf" value="<%= csrf() %>">
+        <button class="btn btn-danger" type="submit" data-confirm="Permanently delete “<%= listing.title %>”? This cannot be undone.">Delete permanently</button>
+      </form>
+    </section>
+  <% } %>
+<% } %>
+<%- include('../partials/staff-footer') %>

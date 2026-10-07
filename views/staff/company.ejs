@@ -1,0 +1,31 @@
+<%- include('../partials/staff-header') %>
+<h1>Company details</h1>
+<p class="muted">These details appear on the home page, About and Contact pages, and in the footer of every page.</p>
+<form method="post" action="/staff/company" class="form form-wide">
+  <input type="hidden" name="_csrf" value="<%= csrf() %>">
+  <fieldset>
+    <legend>Identity</legend>
+    <label class="field">Company name <input name="company_name" required maxlength="100" value="<%= settings.company_name %>"></label>
+    <label class="field">Tagline <span class="optional">(the headline on the home page)</span><input name="tagline" maxlength="200" value="<%= settings.tagline %>"></label>
+    <label class="field">About the company <span class="optional">(leave a blank line between paragraphs)</span><textarea name="about" rows="8"><%= settings.about %></textarea></label>
+    <label class="field">Services <span class="optional">(one per line)</span><textarea name="services" rows="5"><%= settings.services %></textarea></label>
+  </fieldset>
+  <fieldset>
+    <legend>Contact</legend>
+    <div class="field-row">
+      <label class="field">Phone <input name="phone" maxlength="50" value="<%= settings.phone %>"></label>
+      <label class="field">Email <input name="email" type="email" maxlength="200" value="<%= settings.email %>"></label>
+    </div>
+    <label class="field">Address <input name="address" maxlength="300" value="<%= settings.address %>"></label>
+    <label class="field">Opening hours <input name="hours" maxlength="200" value="<%= settings.hours %>"></label>
+  </fieldset>
+  <fieldset>
+    <legend>Other</legend>
+    <div class="field-row">
+      <label class="field">Currency symbol <input name="currency" maxlength="5" value="<%= settings.currency %>"></label>
+      <label class="field">Company registration / VAT <span class="optional">(shown in footer)</span><input name="registration" maxlength="200" value="<%= settings.registration %>"></label>
+    </div>
+  </fieldset>
+  <div class="form-actions"><button class="btn btn-primary" type="submit">Save company details</button></div>
+</form>
+<%- include('../partials/staff-footer') %>
