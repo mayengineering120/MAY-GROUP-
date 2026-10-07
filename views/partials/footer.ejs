@@ -20,6 +20,7 @@
       <p class="footer-heading">Contact</p>
       <ul class="plain">
         <% for (const ph of h.phones(company.phone)) { %><li><a href="<%= h.telHref(ph) %>"><%= ph %></a></li><% } %>
+        <% if (company.whatsapp) { %><li><a href="<%= h.whatsappHref(company.whatsapp) %>" target="_blank" rel="noopener">WhatsApp <%= company.whatsapp %></a></li><% } %>
         <% if (company.email) { %><li><a href="mailto:<%= company.email %>"><%= company.email %></a></li><% } %>
         <% if (company.address) { %><li class="muted"><%= company.address %></li><% } %>
         <% for (const l of h.lines(company.hours)) { %><li class="muted"><%= l %></li><% } %>
@@ -31,5 +32,10 @@
     <a href="/staff">Staff login</a>
   </div>
 </footer>
+<% if (company.whatsapp) { %>
+  <a class="wa-float" href="<%= h.whatsappHref(company.whatsapp, (typeof waText !== 'undefined' && waText) || `Hello ${company.company_name}, I have a question.`) %>" target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">
+    <%- include('whatsapp-icon') %><span class="wa-float-label">Chat on WhatsApp</span>
+  </a>
+<% } %>
 </body>
 </html>

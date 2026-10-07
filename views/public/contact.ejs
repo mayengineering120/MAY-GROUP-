@@ -11,8 +11,13 @@
     </div>
     <aside class="panel">
       <h2 class="h3"><%= company.company_name %></h2>
+      <% if (company.whatsapp) { %>
+        <a class="btn btn-whatsapp btn-block" href="<%= h.whatsappHref(company.whatsapp, `Hello ${company.company_name}, I have a question.`) %>" target="_blank" rel="noopener"><%- include('../partials/whatsapp-icon') %> Chat with us on WhatsApp</a>
+        <p class="small muted center">Usually the fastest way to reach us.</p>
+      <% } %>
       <dl class="details">
         <% if (h.phones(company.phone).length) { %><dt>Phone</dt><dd><% for (const ph of h.phones(company.phone)) { %><a href="<%= h.telHref(ph) %>"><%= ph %></a><br><% } %></dd><% } %>
+        <% if (company.whatsapp) { %><dt>WhatsApp</dt><dd><a href="<%= h.whatsappHref(company.whatsapp) %>" target="_blank" rel="noopener"><%= company.whatsapp %></a></dd><% } %>
         <% if (company.email) { %><dt>Email</dt><dd><a href="mailto:<%= company.email %>"><%= company.email %></a></dd><% } %>
         <% if (company.address) { %><dt>Address</dt><dd><%= company.address %></dd><% } %>
         <% if (company.hours) { %><dt>Opening hours</dt><dd><% for (const l of h.lines(company.hours)) { %><%= l %><br><% } %></dd><% } %>

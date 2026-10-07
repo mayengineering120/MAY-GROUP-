@@ -99,6 +99,7 @@ const DEFAULT_SETTINGS = {
   services: 'Engineering\nHeavy equipment\nMachinery trading\nMachinery rental\nEquipment sourcing',
   ceo_name: 'Ghalib Darwish',
   phone: '+971 7378304\n+971 7865596\n+92 332 7378305',
+  whatsapp: '+971 737 8972',
   email: 'musbahalyaqootengineering@gmail.com',
   notify_email: 'musbahalyaqootengineering@gmail.com',
   address: '',

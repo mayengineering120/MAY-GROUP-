@@ -18,6 +18,7 @@
     <legend>Contact</legend>
     <div class="field-row">
       <label class="field">Phone numbers <span class="optional">(one per line; the first is used for “Call” buttons)</span><textarea name="phone" rows="3" maxlength="300"><%= settings.phone %></textarea></label>
+      <label class="field">WhatsApp number <span class="optional">(with country code; leave empty to hide the WhatsApp buttons)</span><input name="whatsapp" maxlength="50" value="<%= settings.whatsapp %>"></label>
       <label class="field">Public email <span class="optional">(shown on the website)</span><input name="email" type="email" maxlength="200" value="<%= settings.email %>"></label>
     </div>
     <label class="field">Address <input name="address" maxlength="300" value="<%= settings.address %>"></label>

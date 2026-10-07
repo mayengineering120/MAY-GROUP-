@@ -35,6 +35,7 @@ app.use(csrfToken);
 function setLocals(req, res) {
   res.locals.company = getSettings();
   res.locals.path = req.path;
+  res.locals.siteUrl = (process.env.SITE_URL || `${req.protocol}://${req.get('host')}`).replace(/\/+$/, '');
   res.locals.STATUS_LABELS = STATUS_LABELS;
   res.locals.TYPES = TYPES;
   res.locals.OFFER_TYPES = OFFER_TYPES;

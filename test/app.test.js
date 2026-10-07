@@ -73,6 +73,8 @@ test('default company details show the CEO, phone numbers and opening hours', as
   assert.match(about.body, /href="tel:\+923327378305"/);
   assert.match(about.body, /7:00 AM – 6:00 PM/);
   assert.match(about.body, /Friday &amp; Saturday: Closed/);
+  assert.match(about.body, /href="https:\/\/wa\.me\/9717378972\?text=Hello%20MAY%20Group/, 'floating WhatsApp button');
+  assert.match(about.body, /href="https:\/\/wa\.me\/9717378972" target="_blank"/, 'WhatsApp in contact details');
 });
 
 test('posts without a CSRF token are rejected', async () => {
@@ -176,6 +178,10 @@ test('machinery for rent shows on Rentals with rates, and can be marked on rent'
   assert.match(detail.body, /AED 30,000/);
   assert.match(detail.body, /≈ US\$ 8,169/);
   assert.match(detail.body, /I&#39;d like to hire/);
+  // WhatsApp message is pre-filled with the machine and a link to it.
+  const wa = decodeURIComponent(detail.body.match(/class="btn btn-whatsapp" href="https:\/\/wa\.me\/9717378972\?text=([^"]+)"/)[1]);
+  assert.match(wa, /interested in hiring &#34;Liebherr Mobile Crane&#34;|interested in hiring "Liebherr Mobile Crane"/);
+  assert.match(wa, /\/machinery\/liebherr-mobile-crane$/);
 
   const _csrf = await staff.csrf('/staff/machinery');
   await staff.post(`/staff/machinery/${id}/status`, { _csrf, status: 'on_rent' });

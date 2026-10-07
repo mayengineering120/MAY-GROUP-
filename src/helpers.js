@@ -83,6 +83,12 @@ function phones(text) {
     .filter(Boolean);
 }
 
+/** WhatsApp chat link (wa.me) for a number, optionally with a pre-filled message. */
+function whatsappHref(number, text) {
+  const digits = String(number || '').replace(/\D/g, '').replace(/^00/, '');
+  return `https://wa.me/${digits}${text ? `?text=${encodeURIComponent(text)}` : ''}`;
+}
+
 function listingUrl(listing) {
   return `/${listing.type === 'machinery' ? 'machinery' : 'projects'}/${listing.slug}`;
 }
@@ -92,5 +98,5 @@ function telHref(phone) {
 }
 
 module.exports = {
-  AED_PER_USD, CURRENCIES, CURRENCY_LABELS, money, price, priceAlt, forSale, forRent, rentRates, number, date, paragraphs, lines, phones, listingUrl, telHref,
+  AED_PER_USD, CURRENCIES, CURRENCY_LABELS, money, price, priceAlt, forSale, forRent, rentRates, number, date, paragraphs, lines, phones, whatsappHref, listingUrl, telHref,
 };

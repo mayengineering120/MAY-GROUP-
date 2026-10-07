@@ -280,6 +280,16 @@ fieldset.internal { background: #fffbef; border-color: #f0dca6; }
 .inline-details[open] form { margin-top: 6px; }
 .inline-details input { width: 210px !important; padding: .4em .6em !important; }
 
+/* WhatsApp */
+.btn-whatsapp { background: #25d366; border-color: #25d366; color: #fff; }
+.btn-whatsapp:hover { background: #1ebe5b; border-color: #1ebe5b; color: #fff; }
+.wa-float { position: fixed; right: 20px; bottom: 20px; z-index: 30; display: inline-flex; align-items: center; gap: 8px; padding: 12px 18px 12px 14px; border-radius: 999px; background: #25d366; color: #fff; font-weight: 700; text-decoration: none; box-shadow: 0 6px 20px rgba(0, 0, 0, .25); transition: transform .15s; }
+.wa-float:hover { color: #fff; transform: translateY(-2px); }
+.wa-float .wa-icon { width: 28px; height: 28px; }
+.wa-icon { flex: none; }
+.btn .wa-icon { width: 19px; height: 19px; }
+.site-footer { padding-bottom: 90px; }
+
 /* Responsive */
 @media (max-width: 900px) {
   .split, .detail, .two-col { grid-template-columns: 1fr; gap: 28px; }
@@ -297,6 +307,8 @@ fieldset.internal { background: #fffbef; border-color: #f0dca6; }
   .staff-top { flex-wrap: wrap; }
   .staff-user { order: 3; width: 100%; font-size: .8rem; gap: 10px; }
   .specs { grid-template-columns: 1fr; }
+  .wa-float { padding: 14px; right: 16px; bottom: 16px; }
+  .wa-float-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   .container { padding: 0 16px; }
   .brand-logo { height: 40px; }
   .brand-name { font-size: 1rem; }

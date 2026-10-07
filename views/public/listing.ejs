@@ -1,3 +1,4 @@
+<% const waText = `Hello ${company.company_name}, I'm interested in ${h.forRent(listing) && !h.forSale(listing) ? 'hiring ' : ''}"${listing.title}". ${siteUrl}${h.listingUrl(listing)}`; %>
 <%- include('../partials/header', { metaDescription: listing.summary }) %>
 <div class="container">
   <nav class="crumbs small" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/<%= cfg.path %>"><%= cfg.label %></a> / <span><%= listing.title %></span></nav>
@@ -51,6 +52,7 @@
       </dl>
       <% if (listing.status !== 'sold') { %>
         <a class="btn btn-primary" href="#enquire"><%= h.forRent(listing) && !h.forSale(listing) ? 'Enquire about hiring' : `Enquire about this ${cfg.singular.toLowerCase()}` %></a>
+        <% if (company.whatsapp) { %><a class="btn btn-whatsapp" href="<%= h.whatsappHref(company.whatsapp, waText) %>" target="_blank" rel="noopener"><%- include('../partials/whatsapp-icon') %> WhatsApp us</a><% } %>
         <% const mainPhone = h.phones(company.phone)[0]; if (mainPhone) { %><a class="btn btn-ghost" href="<%= h.telHref(mainPhone) %>">Call <%= mainPhone %></a><% } %>
       <% } %>
     </div>
@@ -78,4 +80,4 @@
   </div>
 </section>
 <% } %>
-<%- include('../partials/footer') %>
+<%- include('../partials/footer', { waText }) %>

@@ -12,6 +12,7 @@ The company website, with a secure staff portal for managing machinery and proje
 - **Rentals**: machinery for hire with daily / weekly / monthly rates; machines out on hire show **On rent**
 - **Projects**: projects *for sale*, plus a portfolio of your *ongoing and completed* work
 - **About** and **Contact** pages, built from your company details
+- **WhatsApp**: a floating "Chat on WhatsApp" button on every page, and a WhatsApp button on each machine/project that pre-fills the item's name and link
 - **Enquiry forms** on every listing and on the Contact page (with spam protection), **emailed to the company inbox**
 - **Prices in UAE dirhams and US dollars**: staff enter a price in either currency and the site shows both,
   converted at the official peg (1 US$ = 3.6725 AED), e.g. *AED 250,000 ≈ US$ 68,074*
