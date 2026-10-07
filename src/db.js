@@ -99,7 +99,7 @@ const DEFAULT_SETTINGS = {
   services: 'Engineering\nHeavy equipment\nMachinery trading\nMachinery rental\nEquipment sourcing',
   ceo_name: 'Ghalib Darwish',
   phone: '+971 7378304\n+971 7865596\n+92 332 7378305',
-  whatsapp: '+971 737 8972',
+  whatsapp: '+92 332 7378305',
   email: 'musbahalyaqootengineering@gmail.com',
   notify_email: 'musbahalyaqootengineering@gmail.com',
   address: '',
@@ -129,6 +129,8 @@ db.exec(`CREATE TABLE IF NOT EXISTS migrations (name TEXT PRIMARY KEY, ran_at TE
 const ONE_OFF_MIGRATIONS = {
   '2026-10-google-search-console': () =>
     db.prepare("UPDATE settings SET value = ? WHERE key = 'google_site_verification' AND value = ''").run('U8PTb60tKA2z4aFeILfI75LvMjoYAQfW6cKGG-M17Is'),
+  '2026-10-whatsapp-pakistan-number': () =>
+    db.prepare("UPDATE settings SET value = ? WHERE key = 'whatsapp'").run('+92 332 7378305'),
 };
 for (const [name, run] of Object.entries(ONE_OFF_MIGRATIONS)) {
   if (db.prepare('SELECT 1 FROM migrations WHERE name = ?').get(name)) continue;
