@@ -4,7 +4,37 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><%= title ? `${title} | ${company.company_name}` : `${company.company_name} | ${company.tagline}` %></title>
-  <meta name="description" content="<%= (typeof metaDescription !== 'undefined' && metaDescription) || company.tagline %>">
+  <% const description = (typeof metaDescription !== 'undefined' && metaDescription)
+       || `${company.company_name}${company.subtitle ? ` (${company.subtitle})` : ''}: ${company.tagline}. Heavy machinery for sale and rent, and engineering projects.`;
+     const image = siteUrl + ((typeof ogImage !== 'undefined' && ogImage) || '/static/img/logo-full.png');
+     const isPrivate = (typeof staffArea !== 'undefined' && staffArea) || (typeof status !== 'undefined' && status >= 400); %>
+  <meta name="description" content="<%= description %>">
+  <% if (isPrivate) { %>
+  <meta name="robots" content="noindex, nofollow">
+  <% } else { %>
+  <link rel="canonical" href="<%= siteUrl + path %>">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="<%= company.company_name %>">
+  <meta property="og:title" content="<%= title || company.company_name %>">
+  <meta property="og:description" content="<%= description %>">
+  <meta property="og:url" content="<%= siteUrl + path %>">
+  <meta property="og:image" content="<%= image %>">
+  <% } %>
+  <% if (path === '/') { %>
+  <script type="application/ld+json"><%- JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: company.company_name,
+    alternateName: company.subtitle || undefined,
+    description: company.tagline,
+    url: siteUrl + '/',
+    logo: siteUrl + '/static/img/logo-full.png',
+    email: company.email || undefined,
+    telephone: h.phones(company.phone)[0],
+    address: company.address || undefined,
+    employee: company.ceo_name ? { '@type': 'Person', name: company.ceo_name, jobTitle: 'CEO' } : undefined,
+  }).replace(/</g, '\\u003c') %></script>
+  <% } %>
   <link rel="icon" type="image/png" href="/static/img/favicon.png">
   <meta name="theme-color" content="#0b2f52">
   <link rel="stylesheet" href="/static/css/style.css">

@@ -1,5 +1,5 @@
 <% const waText = `Hello ${company.company_name}, I'm interested in ${h.forRent(listing) && !h.forSale(listing) ? 'hiring ' : ''}"${listing.title}". ${siteUrl}${h.listingUrl(listing)}`; %>
-<%- include('../partials/header', { metaDescription: listing.summary }) %>
+<%- include('../partials/header', { metaDescription: listing.summary, ogImage: images[0] ? `/uploads/${images[0].filename}` : null }) %>
 <div class="container">
   <nav class="crumbs small" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/<%= cfg.path %>"><%= cfg.label %></a> / <span><%= listing.title %></span></nav>
   <% if (!listing.published) { %><div class="alert alert-warning">This listing is a draft and is only visible to staff.</div><% } %>

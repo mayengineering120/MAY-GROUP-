@@ -31,6 +31,24 @@ router.get('/', (req, res) => {
   res.render('public/home', { title: null, machinery: machinery.rows, rentals: rentals.rows, projects: projects.rows, stats });
 });
 
+// Search engines: which pages to crawl, and a list of every public page.
+router.get('/robots.txt', (req, res) => {
+  res.type('text/plain').send(`User-agent: *\nDisallow: /staff\n\nSitemap: ${res.locals.siteUrl}/sitemap.xml\n`);
+});
+
+router.get('/sitemap.xml', (req, res) => {
+  const base = res.locals.siteUrl;
+  const xml = (s) => String(s).replace(/[<>&'"]/g, (c) => `&#${c.charCodeAt(0)};`);
+  const pages = ['/', '/machinery', '/rentals', '/projects', '/about', '/contact'].map((p) => ({ loc: base + p }));
+  const listings = db.prepare('SELECT type, slug, updated_at FROM listings WHERE published = 1 ORDER BY updated_at DESC').all();
+  for (const l of listings) pages.push({ loc: base + listingUrl(l), lastmod: l.updated_at.slice(0, 10) });
+  res.type('application/xml').send(
+    '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+      pages.map((p) => `  <url><loc>${xml(p.loc)}</loc>${p.lastmod ? `<lastmod>${p.lastmod}</lastmod>` : ''}</url>`).join('\n') +
+      '\n</urlset>\n',
+  );
+});
+
 router.get('/about', (req, res) => res.render('public/about', { title: 'About us' }));
 
 router.get('/contact', (req, res) => res.render('public/contact', { title: 'Contact', form: {}, errors: [], listing: null }));

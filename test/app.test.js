@@ -219,6 +219,21 @@ test('visitor enquiries reach the staff inbox', async () => {
   assert.match(inbox.body, /Do you have dumpers\?/);
 });
 
+test('search engines get robots.txt, a sitemap of public pages, and no staff pages', async () => {
+  const robots = await visitor.get('/robots.txt');
+  assert.match(robots.body, /Disallow: \/staff/);
+  assert.match(robots.body, /Sitemap: http:\/\/127\.0\.0\.1:\d+\/sitemap\.xml/);
+  const sitemap = await visitor.get('/sitemap.xml');
+  assert.match(sitemap.body, /<loc>http:\/\/127\.0\.0\.1:\d+\/rentals<\/loc>/);
+  assert.match(sitemap.body, /\/machinery\/liebherr-mobile-crane<\/loc><lastmod>\d{4}-\d\d-\d\d</);
+  assert.doesNotMatch(sitemap.body, /secret-riverside/, 'drafts are not in the sitemap');
+  const home = await visitor.get('/');
+  assert.match(home.body, /<link rel="canonical" href="http:\/\/127\.0\.0\.1:\d+\/">/);
+  assert.match(home.body, /"@type":"Organization"/);
+  assert.doesNotMatch(home.body, /noindex/);
+  assert.match((await staff.get('/staff')).body, /<meta name="robots" content="noindex, nofollow">/);
+});
+
 test('only admins can delete listings', async () => {
   const _csrf = await staff.csrf('/staff/machinery');
   assert.strictEqual((await staff.post(`/staff/machinery/${machineId}/delete`, { _csrf })).status, 403);
