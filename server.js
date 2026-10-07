@@ -2,7 +2,7 @@ const path = require('node:path');
 const express = require('express');
 const { getSettings } = require('./src/db');
 const { sessionMiddleware, csrfToken, loadUser } = require('./src/auth');
-const { UPLOAD_DIR, STATUS_LABELS, TYPES, OFFER_TYPES } = require('./src/listings');
+const { UPLOAD_DIR, STATUS_LABELS, TYPES, OFFER_TYPES, RENT_PERIODS, PROPERTY_TYPES } = require('./src/listings');
 const helpers = require('./src/helpers');
 
 const app = express();
@@ -39,6 +39,8 @@ function setLocals(req, res) {
   res.locals.STATUS_LABELS = STATUS_LABELS;
   res.locals.TYPES = TYPES;
   res.locals.OFFER_TYPES = OFFER_TYPES;
+  res.locals.RENT_PERIODS = RENT_PERIODS;
+  res.locals.PROPERTY_TYPES = PROPERTY_TYPES;
   res.locals.h = helpers;
   res.locals.flash = req.session?.flash || null;
   if (req.session?.flash) delete req.session.flash;

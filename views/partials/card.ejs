@@ -3,7 +3,7 @@
     <% if (item.cover) { %>
       <img src="/uploads/<%= item.cover %>" alt="" loading="lazy">
     <% } else { %>
-      <div class="placeholder" aria-hidden="true"><%= item.type === 'machinery' ? 'No photo yet' : 'Project' %></div>
+      <div class="placeholder" aria-hidden="true"><%= item.type === 'machinery' ? 'No photo yet' : item.type === 'property' ? 'Property' : 'Project' %></div>
     <% } %>
     <span class="badge badge-<%= item.status %>"><%= STATUS_LABELS[item.status] %></span>
     <% if (h.forRent(item) && item.status !== 'sold') { %><span class="badge badge-offer"><%= item.offer_type === 'both' ? 'Sale & rent' : 'For rent' %></span><% } %>
@@ -13,6 +13,8 @@
     <p class="card-meta">
       <% if (item.type === 'machinery') { %>
         <%= [item.year, item.make, item.hours != null ? `${h.number(item.hours)} hrs` : null].filter(Boolean).join(' · ') %>
+      <% } else if (item.type === 'property') { %>
+        <%= [item.category, ...h.propertyFacts(item), item.location].filter(Boolean).join(' · ') %>
       <% } else { %>
         <%= [item.category, item.location].filter(Boolean).join(' · ') %>
       <% } %>

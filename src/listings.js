@@ -11,6 +11,7 @@ const STATUS_LABELS = {
   available: 'Available',
   under_offer: 'Under offer',
   on_rent: 'On rent',
+  rented: 'Rented',
   sold: 'Sold',
   ongoing: 'Ongoing',
   completed: 'Completed',
@@ -33,9 +34,23 @@ const TYPES = {
     // "ongoing" and "completed" are portfolio projects shown off rather than sold.
     statuses: ['available', 'under_offer', 'sold', 'ongoing', 'completed'],
   },
+  property: {
+    key: 'property',
+    label: 'Real Estate',
+    singular: 'Property',
+    path: 'real-estate',
+    // "rented" means currently let to a tenant.
+    statuses: ['available', 'under_offer', 'rented', 'sold'],
+  },
 };
 
-// Machinery can be offered for sale, for rent, or both.
+// Machinery and real estate can be offered for sale, for rent, or both.
+const RENTABLE = ['machinery', 'property'];
+// Rental periods offered per type (columns rent_<period>).
+const RENT_PERIODS = { machinery: ['day', 'week', 'month'], property: ['month', 'year'] };
+// Suggestions for the property "type" (stored in category).
+const PROPERTY_TYPES = ['Apartment', 'Villa', 'Townhouse', 'Office', 'Shop', 'Warehouse', 'Land / Plot', 'Building'];
+
 const OFFER_TYPES = { sale: 'For sale', rent: 'For rent', both: 'For sale & rent' };
 
 // Public filter tabs: each maps to a set of statuses (and, for machinery, offer types).
@@ -51,6 +66,12 @@ const FILTERS = {
     { key: 'portfolio', label: 'Our work', statuses: ['ongoing', 'completed'] },
     { key: 'sold', label: 'Sold', statuses: ['sold'] },
     { key: 'all', label: 'All', statuses: TYPES.project.statuses },
+  ],
+  property: [
+    { key: 'available', label: 'For sale', statuses: ['available', 'under_offer'], offerTypes: ['sale', 'both'] },
+    { key: 'rent', label: 'For rent', statuses: ['available', 'under_offer'], offerTypes: ['rent', 'both'] },
+    { key: 'sold', label: 'Sold & rented', statuses: ['sold', 'rented'] },
+    { key: 'all', label: 'All', statuses: TYPES.property.statuses },
   ],
 };
 
@@ -155,6 +176,7 @@ const str = (v, max = 5000) => String(v ?? '').trim().slice(0, max);
 /** Validate and normalise form input. Returns { data, errors }. */
 function fromForm(type, body) {
   const cfg = TYPES[type];
+  const rentPeriods = RENT_PERIODS[type] || [];
   const data = {
     title: str(body.title, 200),
     category: str(body.category, 100),
@@ -166,10 +188,14 @@ function fromForm(type, body) {
     location: str(body.location, 200),
     price: toPrice(body.price),
     price_currency: CURRENCIES.includes(body.price_currency) ? body.price_currency : 'AED',
-    offer_type: type === 'machinery' && OFFER_TYPES[body.offer_type] ? body.offer_type : 'sale',
-    rent_day: type === 'machinery' ? toPrice(body.rent_day) : null,
-    rent_week: type === 'machinery' ? toPrice(body.rent_week) : null,
-    rent_month: type === 'machinery' ? toPrice(body.rent_month) : null,
+    offer_type: RENTABLE.includes(type) && OFFER_TYPES[body.offer_type] ? body.offer_type : 'sale',
+    rent_day: rentPeriods.includes('day') ? toPrice(body.rent_day) : null,
+    rent_week: rentPeriods.includes('week') ? toPrice(body.rent_week) : null,
+    rent_month: rentPeriods.includes('month') ? toPrice(body.rent_month) : null,
+    rent_year: rentPeriods.includes('year') ? toPrice(body.rent_year) : null,
+    bedrooms: type === 'property' ? toInt(body.bedrooms) : null,
+    bathrooms: type === 'property' ? toInt(body.bathrooms) : null,
+    area: type === 'property' ? toPrice(body.area) : null,
     price_on_request: body.price_on_request ? 1 : 0,
     make: str(body.make, 100),
     model: str(body.model, 100),
@@ -184,12 +210,13 @@ function fromForm(type, body) {
   if (!data.title) errors.push('Title is required.');
   if (data.year !== null && (data.year < 1900 || data.year > 2100)) errors.push('Year looks invalid.');
   if (data.price !== null && data.price < 0) errors.push('Price cannot be negative.');
+  if ([data.bedrooms, data.bathrooms].some((n) => n !== null && (n < 0 || n > 100))) errors.push('Bedrooms/bathrooms look invalid.');
   return { data, errors };
 }
 
 const FIELDS = [
   'title', 'category', 'status', 'published', 'featured', 'summary', 'description', 'location', 'price',
-  'price_currency', 'price_on_request', 'offer_type', 'rent_day', 'rent_week', 'rent_month', 'make', 'model', 'year', 'hours', 'condition', 'client', 'completed_on', 'internal_notes',
+  'price_currency', 'price_on_request', 'offer_type', 'rent_day', 'rent_week', 'rent_month', 'rent_year', 'bedrooms', 'bathrooms', 'area', 'make', 'model', 'year', 'hours', 'condition', 'client', 'completed_on', 'internal_notes',
 ];
 
 function create(type, data, userId) {
@@ -262,7 +289,7 @@ function remove(id) {
 }
 
 module.exports = {
-  TYPES, FILTERS, STATUS_LABELS, OFFER_TYPES, UPLOAD_DIR,
+  TYPES, FILTERS, STATUS_LABELS, OFFER_TYPES, RENTABLE, RENT_PERIODS, PROPERTY_TYPES, UPLOAD_DIR,
   search, categories, findById, findBySlug, images, fromForm, create, update, setStatus,
   addImages, removeImage, makeCover, remove, slugify, unlinkUpload,
 };

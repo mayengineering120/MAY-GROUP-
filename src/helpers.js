@@ -33,18 +33,22 @@ function priceAlt(listing) {
   return converted(listing.price, listing.price_currency || 'AED');
 }
 
+// Machinery and real estate can be offered for rent as well as for sale.
+const RENTABLE = ['machinery', 'property'];
+
 function forSale(listing) {
-  return listing.type !== 'machinery' || listing.offer_type !== 'rent';
+  return !RENTABLE.includes(listing.type) || listing.offer_type !== 'rent';
 }
 
 function forRent(listing) {
-  return listing.type === 'machinery' && (listing.offer_type === 'rent' || listing.offer_type === 'both');
+  return RENTABLE.includes(listing.type) && (listing.offer_type === 'rent' || listing.offer_type === 'both');
 }
 
 /** Rental rates that have been filled in: [{ period: 'day', main: 'AED 1,500', alt: '≈ US$ 408' }, ...] */
 function rentRates(listing) {
   const currency = listing.price_currency || 'AED';
-  return [['rent_day', 'day'], ['rent_week', 'week'], ['rent_month', 'month']]
+  return ['day', 'week', 'month', 'year']
+    .map((period) => [`rent_${period}`, period])
     .filter(([key]) => listing[key] != null)
     .map(([key, period]) => ({ period, main: money(listing[key], currency), alt: converted(listing[key], currency) }));
 }
@@ -89,8 +93,24 @@ function whatsappHref(number, text) {
   return `https://wa.me/${digits}${text ? `?text=${encodeURIComponent(text)}` : ''}`;
 }
 
+const TYPE_PATHS = { machinery: 'machinery', project: 'projects', property: 'real-estate' };
+
 function listingUrl(listing) {
-  return `/${listing.type === 'machinery' ? 'machinery' : 'projects'}/${listing.slug}`;
+  return `/${TYPE_PATHS[listing.type]}/${listing.slug}`;
+}
+
+/** Short facts line for a property card, e.g. "3 bed · 2 bath · 1,850 sq ft". */
+function propertyFacts(listing) {
+  return [
+    listing.bedrooms != null ? (listing.bedrooms === 0 ? 'Studio' : `${listing.bedrooms} bed`) : null,
+    listing.bathrooms != null ? `${listing.bathrooms} bath` : null,
+    listing.area != null ? `${number(listing.area)} sq ft` : null,
+  ].filter(Boolean);
+}
+
+/** Wording for a rent enquiry: machines are hired, property is rented. */
+function rentVerb(listing) {
+  return listing.type === 'property' ? 'renting' : 'hiring';
 }
 
 function telHref(phone) {
@@ -98,5 +118,5 @@ function telHref(phone) {
 }
 
 module.exports = {
-  AED_PER_USD, CURRENCIES, CURRENCY_LABELS, money, price, priceAlt, forSale, forRent, rentRates, number, date, paragraphs, lines, phones, whatsappHref, listingUrl, telHref,
+  AED_PER_USD, CURRENCIES, CURRENCY_LABELS, money, price, priceAlt, forSale, forRent, rentRates, number, date, paragraphs, lines, phones, whatsappHref, listingUrl, propertyFacts, rentVerb, telHref,
 };

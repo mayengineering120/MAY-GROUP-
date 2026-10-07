@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS settings (
 
 CREATE TABLE IF NOT EXISTS listings (
   id               INTEGER PRIMARY KEY,
-  type             TEXT NOT NULL CHECK (type IN ('machinery', 'project')),
+  type             TEXT NOT NULL CHECK (type IN ('machinery', 'project', 'property')),
   title            TEXT NOT NULL,
   slug             TEXT NOT NULL UNIQUE,
   category         TEXT NOT NULL DEFAULT '',
@@ -43,6 +43,10 @@ CREATE TABLE IF NOT EXISTS listings (
   rent_day         REAL,
   rent_week        REAL,
   rent_month       REAL,
+  rent_year        REAL,
+  bedrooms         INTEGER,
+  bathrooms        INTEGER,
+  area             REAL,
   price_on_request INTEGER NOT NULL DEFAULT 0,
   make             TEXT NOT NULL DEFAULT '',
   model            TEXT NOT NULL DEFAULT '',
@@ -96,7 +100,7 @@ const DEFAULT_SETTINGS = {
     'MAY Group (Musbah Al Yaqoot) is an engineering, heavy equipment and machinery trading company. ' +
     'We sell and rent out quality machinery and deliver engineering projects for our clients.\n\n' +
     'Edit this text from the staff portal under Company Details.',
-  services: 'Engineering\nHeavy equipment\nMachinery trading\nMachinery rental\nEquipment sourcing',
+  services: 'Engineering\nHeavy equipment\nMachinery trading\nMachinery rental\nReal estate\nEquipment sourcing',
   ceo_name: 'Ghalib Darwish',
   phone: '+971 7378304\n+971 7865596\n+92 332 7378305',
   whatsapp: '+92 332 7378305',
@@ -118,6 +122,38 @@ addColumn('offer_type', "TEXT NOT NULL DEFAULT 'sale'");
 addColumn('rent_day', 'REAL');
 addColumn('rent_week', 'REAL');
 addColumn('rent_month', 'REAL');
+addColumn('rent_year', 'REAL');
+addColumn('bedrooms', 'INTEGER');
+addColumn('bathrooms', 'INTEGER');
+addColumn('area', 'REAL');
+
+// Older databases only allowed 'machinery' and 'project' listings. SQLite can't change a CHECK
+// constraint in place, so rebuild the table (keeping every row and id) to allow 'property'.
+const listingsSql = db.prepare("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'listings'").get().sql;
+if (!listingsSql.includes("'property'")) {
+  const newSql = listingsSql
+    .replace(/CHECK \(type IN \('machinery', 'project'\)\)/, "CHECK (type IN ('machinery', 'project', 'property'))")
+    .replace(/^CREATE TABLE (IF NOT EXISTS )?"?listings"?/, 'CREATE TABLE listings_new');
+  if (!newSql.includes("'property'") || !newSql.startsWith('CREATE TABLE listings_new')) {
+    throw new Error('Could not upgrade the listings table to allow real estate.');
+  }
+  const cols = db.prepare('PRAGMA table_info(listings)').all().map((c) => `"${c.name}"`).join(', ');
+  db.exec('PRAGMA foreign_keys = OFF'); // so dropping the old table doesn't delete photos/enquiries
+  db.exec('BEGIN');
+  try {
+    db.exec(newSql);
+    db.exec(`INSERT INTO listings_new (${cols}) SELECT ${cols} FROM listings`);
+    db.exec('DROP TABLE listings');
+    db.exec('ALTER TABLE listings_new RENAME TO listings');
+    db.exec('CREATE INDEX IF NOT EXISTS idx_listings_type_status ON listings(type, status)');
+    db.exec('COMMIT');
+  } catch (err) {
+    db.exec('ROLLBACK');
+    throw err;
+  } finally {
+    db.exec('PRAGMA foreign_keys = ON');
+  }
+}
 db.exec("DELETE FROM settings WHERE key = 'currency'");
 
 const insertSetting = db.prepare('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)');
@@ -131,6 +167,10 @@ const ONE_OFF_MIGRATIONS = {
     db.prepare("UPDATE settings SET value = ? WHERE key = 'google_site_verification' AND value = ''").run('U8PTb60tKA2z4aFeILfI75LvMjoYAQfW6cKGG-M17Is'),
   '2026-10-whatsapp-pakistan-number': () =>
     db.prepare("UPDATE settings SET value = ? WHERE key = 'whatsapp'").run('+92 332 7378305'),
+  '2026-10-real-estate-service': () =>
+    db.prepare(
+      "UPDATE settings SET value = value || char(10) || 'Real estate' WHERE key = 'services' AND value NOT LIKE '%real estate%'",
+    ).run(),
 };
 for (const [name, run] of Object.entries(ONE_OFF_MIGRATIONS)) {
   if (db.prepare('SELECT 1 FROM migrations WHERE name = ?').get(name)) continue;

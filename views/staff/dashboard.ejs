@@ -5,7 +5,7 @@
     <a class="tile" href="/staff/<%= cfg.path %>">
       <span class="tile-label"><%= cfg.label %></span>
       <span class="tile-value"><%= c.available || 0 %> <small>available</small></span>
-      <span class="small muted"><% if (cfg.key === 'machinery') { %><%= c.on_rent || 0 %> on rent · <% } %><%= c.sold || 0 %> sold · <%= c.drafts || 0 %> drafts · <%= c.total || 0 %> total</span>
+      <span class="small muted"><% if (cfg.key === 'machinery') { %><%= c.on_rent || 0 %> on rent · <% } %><% if (cfg.key === 'property') { %><%= c.rented || 0 %> rented · <% } %><%= c.sold || 0 %> sold · <%= c.drafts || 0 %> drafts · <%= c.total || 0 %> total</span>
     </a>
   <% } %>
   <a class="tile<%= openEnquiries ? ' tile-alert' : '' %>" href="/staff/enquiries">
@@ -16,6 +16,7 @@
 </div>
 <div class="quick-actions">
   <a class="btn btn-primary" href="/staff/machinery/new">+ Add machinery</a>
+  <a class="btn btn-primary" href="/staff/real-estate/new">+ Add property</a>
   <a class="btn btn-primary" href="/staff/projects/new">+ Add project</a>
 </div>
 <div class="two-col">

@@ -125,6 +125,7 @@ router.get('/', (req, res) => {
          SUM(status IN ('available','under_offer')) AS available,
          SUM(status = 'sold') AS sold,
          SUM(status = 'on_rent') AS on_rent,
+         SUM(status = 'rented') AS rented,
          SUM(published = 0) AS drafts,
          COUNT(*) AS total
        FROM listings GROUP BY type`,

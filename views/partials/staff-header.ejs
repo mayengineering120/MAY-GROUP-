@@ -11,7 +11,7 @@
 </header>
 <div class="staff-layout">
   <nav id="staff-nav" class="staff-nav site-nav" aria-label="Staff">
-    <% const links = [['/staff', 'Dashboard'], ['/staff/machinery', 'Machinery'], ['/staff/projects', 'Projects'], ['/staff/enquiries', 'Enquiries'], ['/staff/account', 'My account']];
+    <% const links = [['/staff', 'Dashboard'], ['/staff/machinery', 'Machinery'], ['/staff/real-estate', 'Real estate'], ['/staff/projects', 'Projects'], ['/staff/enquiries', 'Enquiries'], ['/staff/account', 'My account']];
        if (user.role === 'admin') links.push(['/staff/company', 'Company details'], ['/staff/users', 'Staff accounts']); %>
     <% for (const [href, label] of links) { const active = href === '/staff' ? (path === '/staff' || path === '/staff/') : path.startsWith(href); %>
       <a href="<%= href %>"<%- active ? ' aria-current="page"' : '' %>><%= label %></a>

@@ -190,6 +190,46 @@ test('machinery for rent shows on Rentals with rates, and can be marked on rent'
   assert.match(after.body, /badge-on_rent/);
 });
 
+test('real estate: properties for sale and rent, with property details', async () => {
+  const fd = new FormData();
+  fd.append('_csrf', await staff.csrf('/staff/real-estate/new'));
+  fd.append('title', '2 Bedroom Apartment Al Nahda');
+  fd.append('category', 'Apartment');
+  fd.append('offer_type', 'rent');
+  fd.append('price_currency', 'AED');
+  fd.append('rent_year', '85000');
+  fd.append('rent_month', '7500');
+  fd.append('bedrooms', '2');
+  fd.append('bathrooms', '3');
+  fd.append('area', '1250');
+  fd.append('location', 'Dubai');
+  fd.append('published', '1');
+  const res = await staff.post('/staff/real-estate', fd);
+  assert.strictEqual(res.status, 302);
+  const id = Number(res.location.match(/\/(\d+)\/edit/)[1]);
+
+  const forRent = await visitor.get('/real-estate?status=rent');
+  assert.match(forRent.body, /2 Bedroom Apartment Al Nahda/);
+  assert.match(forRent.body, /Apartment · 2 bed · 3 bath · 1,250 sq ft · Dubai/);
+  assert.match(forRent.body, /AED 7,500<\/strong> \/ month/);
+  assert.doesNotMatch((await visitor.get('/real-estate')).body, /Al Nahda/, 'rent-only property is not under For sale');
+  assert.doesNotMatch((await visitor.get('/machinery?status=all')).body, /Al Nahda/, 'properties are not machinery');
+
+  const detail = await visitor.get('/real-estate/2-bedroom-apartment-al-nahda');
+  assert.match(detail.body, /Per year/);
+  assert.match(detail.body, /AED 85,000/);
+  assert.match(detail.body, /Enquire about renting/);
+  assert.match(detail.body, /I&#39;d like to rent/);
+  assert.match((await visitor.get('/sitemap.xml')).body, /\/real-estate\/2-bedroom-apartment-al-nahda</);
+  assert.match((await visitor.get('/')).body, /Real estate/);
+
+  const _csrf = await staff.csrf('/staff/real-estate');
+  await staff.post(`/staff/real-estate/${id}/status`, { _csrf, status: 'rented' });
+  const rented = await visitor.get('/real-estate?status=sold');
+  assert.match(rented.body, /Al Nahda/);
+  assert.match(rented.body, /badge-rented/);
+});
+
 test('drafts are hidden from the public', async () => {
   const fd = new FormData();
   fd.append('_csrf', await staff.csrf('/staff/projects/new'));

@@ -35,8 +35,9 @@
           <input type="hidden" name="_csrf" value="<%= csrf() %>">
           <% if (l.status !== 'sold') { %>
             <% if (h.forRent(l)) { %>
-              <% if (l.status === 'on_rent') { %><button class="btn btn-small" name="status" value="available" type="submit">Back from rent</button>
-              <% } else { %><button class="btn btn-small btn-rent" name="status" value="on_rent" type="submit">Mark on rent</button><% } %>
+              <% const rentedStatus = l.type === 'property' ? 'rented' : 'on_rent'; %>
+              <% if (l.status === rentedStatus) { %><button class="btn btn-small" name="status" value="available" type="submit"><%= l.type === 'property' ? 'Available again' : 'Back from rent' %></button>
+              <% } else { %><button class="btn btn-small btn-rent" name="status" value="<%= rentedStatus %>" type="submit"><%= l.type === 'property' ? 'Mark rented' : 'Mark on rent' %></button><% } %>
             <% } %>
             <% if (h.forSale(l)) { %><button class="btn btn-small btn-sold" name="status" value="sold" type="submit">Mark sold</button><% } %>
           <% } else { %>

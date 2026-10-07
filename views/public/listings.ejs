@@ -2,7 +2,8 @@
 <section class="page-head">
   <div class="container">
     <h1><%= title %></h1>
-    <p class="lead"><%= filter.key === 'rent' ? 'Hire well-maintained machinery by the day, week or month. Contact us for availability and long-term rates.'
+    <p class="lead"><%= cfg.key === 'property' ? 'Apartments, villas, offices, warehouses and land for sale and for rent. Contact us to arrange a viewing.'
+      : filter.key === 'rent' ? 'Hire well-maintained machinery by the day, week or month. Contact us for availability and long-term rates.'
       : cfg.key === 'machinery' ? 'Quality machinery ready to work. Buy or rent, or see what we have recently sold.'
       : 'Projects available for sale, and a look at the work we have delivered.' %></p>
   </div>
@@ -11,7 +12,7 @@
   <div class="container">
     <nav class="tabs" aria-label="Filter by status">
       <% for (const f of filters) { %>
-        <a href="<%= f.key === 'rent' ? '/rentals' : `/${cfg.path}?status=${f.key}` %>"<%- f.key === filter.key ? ' aria-current="true"' : '' %>><%= f.label %></a>
+        <a href="<%= cfg.key === 'machinery' && f.key === 'rent' ? '/rentals' : `/${cfg.path}?status=${f.key}` %>"<%- f.key === filter.key ? ' aria-current="true"' : '' %>><%= f.label %></a>
       <% } %>
     </nav>
     <form class="toolbar" method="get">
@@ -21,7 +22,7 @@
       <% if (categories.length) { %>
         <label class="sr-only" for="category">Category</label>
         <select id="category" name="category">
-          <option value="">All categories</option>
+          <option value=""><%= cfg.key === 'property' ? 'All property types' : 'All categories' %></option>
           <% for (const c of categories) { %><option<%- c === category ? ' selected' : '' %>><%= c %></option><% } %>
         </select>
       <% } %>

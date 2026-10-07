@@ -24,11 +24,11 @@
   <input type="hidden" name="_csrf" value="<%= csrf() %>">
   <fieldset>
     <legend>Main details</legend>
-    <label class="field">Title <input name="title" required maxlength="200" value="<%= listing.title || '' %>" placeholder="<%= cfg.key === 'machinery' ? 'e.g. Caterpillar 320 Excavator' : 'e.g. Riverside Business Park, Phase 2' %>"></label>
+    <label class="field">Title <input name="title" required maxlength="200" value="<%= listing.title || '' %>" placeholder="<%= cfg.key === 'machinery' ? 'e.g. Caterpillar 320 Excavator' : cfg.key === 'property' ? 'e.g. 2 Bedroom Apartment, Al Nahda' : 'e.g. Riverside Business Park, Phase 2' %>"></label>
     <div class="field-row">
-      <label class="field">Category
-        <input name="category" maxlength="100" list="category-list" value="<%= listing.category || '' %>" placeholder="<%= cfg.key === 'machinery' ? 'e.g. Excavators' : 'e.g. Commercial' %>">
-        <datalist id="category-list"><% for (const c of categories) { %><option value="<%= c %>"><% } %></datalist>
+      <label class="field"><%= cfg.key === 'property' ? 'Property type' : 'Category' %>
+        <input name="category" maxlength="100" list="category-list" value="<%= listing.category || '' %>" placeholder="<%= cfg.key === 'machinery' ? 'e.g. Excavators' : cfg.key === 'property' ? 'e.g. Apartment, Villa, Land / Plot' : 'e.g. Commercial' %>">
+        <datalist id="category-list"><% for (const c of new Set([...(cfg.key === 'property' ? PROPERTY_TYPES : []), ...categories])) { %><option value="<%= c %>"><% } %></datalist>
       </label>
       <label class="field">Status
         <select name="status"><% for (const s of cfg.statuses) { %><option value="<%= s %>"<%- s === listing.status ? ' selected' : '' %>><%= STATUS_LABELS[s] %></option><% } %></select>
@@ -52,6 +52,16 @@
       <label class="field">Condition <input name="condition" maxlength="100" value="<%= listing.condition || '' %>" placeholder="e.g. Excellent, Used, Refurbished"></label>
     </div>
   </fieldset>
+  <% } else if (cfg.key === 'property') { %>
+  <fieldset>
+    <legend>Property details</legend>
+    <div class="field-row">
+      <label class="field">Bedrooms <span class="optional">(0 = studio)</span><input name="bedrooms" inputmode="numeric" value="<%= listing.bedrooms ?? '' %>"></label>
+      <label class="field">Bathrooms <input name="bathrooms" inputmode="numeric" value="<%= listing.bathrooms ?? '' %>"></label>
+      <label class="field">Area (sq ft) <input name="area" inputmode="decimal" value="<%= listing.area ?? '' %>"></label>
+    </div>
+    <p class="small muted">Leave bedrooms and bathrooms empty for land, warehouses or offices where they don't apply.</p>
+  </fieldset>
   <% } else { %>
   <fieldset>
     <legend>Project details</legend>
@@ -63,9 +73,10 @@
   <% } %>
 
   <fieldset>
-    <legend><%= cfg.key === 'machinery' ? 'Sale or rent' : 'Price' %></legend>
-    <% if (cfg.key === 'machinery') { %>
-      <div class="offer-choice" role="radiogroup" aria-label="Offer this machine">
+    <% const rentable = RENT_PERIODS[cfg.key]; %>
+    <legend><%= rentable ? 'Sale or rent' : 'Price' %></legend>
+    <% if (rentable) { %>
+      <div class="offer-choice" role="radiogroup" aria-label="Offer this <%= cfg.singular.toLowerCase() %>">
         <% for (const [key, label] of Object.entries(OFFER_TYPES)) { %>
           <label class="check"><input type="radio" name="offer_type" value="<%= key %>"<%- (listing.offer_type || 'sale') === key ? ' checked' : '' %>> <%= label %></label>
         <% } %>
@@ -81,13 +92,14 @@
       <label class="field">Sale price <input name="price" inputmode="decimal" value="<%= listing.price ?? '' %>"></label>
       <label class="check"><input type="checkbox" name="price_on_request" value="1"<%- listing.price_on_request ? ' checked' : '' %>> Show “Price on request” instead</label>
     </div>
-    <% if (cfg.key === 'machinery') { %>
+    <% if (rentable) { %>
     <div class="field-row" data-offer="rent">
-      <label class="field">Rent per day <input name="rent_day" inputmode="decimal" value="<%= listing.rent_day ?? '' %>"></label>
-      <label class="field">Rent per week <input name="rent_week" inputmode="decimal" value="<%= listing.rent_week ?? '' %>"></label>
-      <label class="field">Rent per month <input name="rent_month" inputmode="decimal" value="<%= listing.rent_month ?? '' %>"></label>
+      <% for (const period of rentable) { %>
+        <label class="field">Rent per <%= period %> <input name="rent_<%= period %>" inputmode="decimal" value="<%= listing[`rent_${period}`] ?? '' %>"></label>
+      <% } %>
     </div>
-    <p class="small muted" data-offer="rent">Fill in the rental rates you offer; leave a box empty to hide it. With no rates the website shows “Rental rates on request”. Set the status to <strong>On rent</strong> while the machine is out on hire.</p>
+    <p class="small muted" data-offer="rent">Fill in the rental rates you offer; leave a box empty to hide it. With no rates the website shows “Rental rates on request”.
+      <% if (cfg.key === 'machinery') { %>Set the status to <strong>On rent</strong> while the machine is out on hire.<% } else { %>Set the status to <strong>Rented</strong> once a tenant moves in.<% } %></p>
     <% } %>
     <p class="small muted">The website shows prices in both currencies, converting at the official peg of 1 US$ = <%= h.AED_PER_USD %> AED.</p>
   </fieldset>

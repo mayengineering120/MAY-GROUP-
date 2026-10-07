@@ -44,6 +44,19 @@
 </section>
 <% } %>
 
+<% if (properties.length) { %>
+<section class="section section-tight-top">
+  <div class="container">
+    <div class="section-head">
+      <h2>Real estate</h2>
+      <a href="/real-estate">See all properties &rarr;</a>
+    </div>
+    <p class="muted">Properties and land for sale and for rent.</p>
+    <div class="grid"><% for (const item of properties) { %><%- include('../partials/card', { item }) %><% } %></div>
+  </div>
+</section>
+<% } %>
+
 <section class="section section-alt">
   <div class="container split">
     <div>

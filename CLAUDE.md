@@ -8,7 +8,8 @@ commit, and push to the deployment branch (the repo's default branch); the live 
 - Node.js ≥ 22.13, Express 5, EJS templates, SQLite via built-in `node:sqlite` (no native deps)
 - `server.js`: app setup, security headers, error pages, `/healthz`
 - `src/db.js`: schema, **migrations** (`addColumn`), default company settings
-- `src/listings.js`: machinery/project model: statuses, sale/rent offer types, public filter tabs
+- `src/listings.js`: listing types `machinery`, `project`, `property` (real estate, `/real-estate`): statuses,
+  sale/rent offer types (`RENTABLE`, `RENT_PERIODS`), public filter tabs
 - `src/helpers.js`: template helpers (`h.*`): AED/USD prices (fixed peg 3.6725), rent rates, phones
 - `src/routes/public.js`: public pages; `src/routes/staff.js`: staff portal (`/staff`)
 - `src/auth.js`: sessions (SQLite store), CSRF (`csrf()` in forms + `verifyCsrf`), roles, login throttle
@@ -29,7 +30,8 @@ entry to `ONE_OFF_MIGRATIONS` in `src/db.js` (runs once on the live site) and up
   (multipart forms: `upload, verifyCsrfUpload`).
 - Escape output with `<%= %>`; only use `<%- %>` for `include()` or trusted static markup.
 - Never show `internal_notes` on public pages.
-- Schema changes: add the column to `CREATE TABLE` **and** an `addColumn(...)` migration.
+- Schema changes: add the column to `CREATE TABLE` **and** an `addColumn(...)` migration. A new listing
+  type also needs the `type` CHECK updated (see the table-rebuild migration in `src/db.js`).
 - No inline `<script>` or `style=""`: the Content-Security-Policy blocks them; put JS in `public/js/main.js`.
 
 ## Checks before pushing

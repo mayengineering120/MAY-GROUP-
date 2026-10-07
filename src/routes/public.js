@@ -18,6 +18,7 @@ router.get('/', (req, res) => {
     statuses: L.TYPES.project.statuses.filter((s) => s !== 'sold'),
     limit: 3,
   });
+  const properties = L.search({ type: 'property', statuses: ['available', 'under_offer'], publishedOnly: true, limit: 3 });
   const stats = db
     .prepare(
       `SELECT
@@ -28,7 +29,7 @@ router.get('/', (req, res) => {
        FROM listings WHERE published = 1`,
     )
     .get();
-  res.render('public/home', { title: null, machinery: machinery.rows, rentals: rentals.rows, projects: projects.rows, stats });
+  res.render('public/home', { title: null, machinery: machinery.rows, rentals: rentals.rows, properties: properties.rows, projects: projects.rows, stats });
 });
 
 // Search engines: which pages to crawl, and a list of every public page.
@@ -39,7 +40,7 @@ router.get('/robots.txt', (req, res) => {
 router.get('/sitemap.xml', (req, res) => {
   const base = res.locals.siteUrl;
   const xml = (s) => String(s).replace(/[<>&'"]/g, (c) => `&#${c.charCodeAt(0)};`);
-  const pages = ['/', '/machinery', '/rentals', '/projects', '/about', '/contact'].map((p) => ({ loc: base + p }));
+  const pages = ['/', '/machinery', '/rentals', '/real-estate', '/projects', '/about', '/contact'].map((p) => ({ loc: base + p }));
   const listings = db.prepare('SELECT type, slug, updated_at FROM listings WHERE published = 1 ORDER BY updated_at DESC').all();
   for (const l of listings) pages.push({ loc: base + listingUrl(l), lastmod: l.updated_at.slice(0, 10) });
   res.type('application/xml').send(
@@ -105,7 +106,7 @@ function listRoute(type, defaultFilter) {
       offset: (page - 1) * PER_PAGE,
     });
     res.render('public/listings', {
-      title: filter.key === 'rent' ? 'Machinery for rent' : L.TYPES[type].label,
+      title: type === 'machinery' && filter.key === 'rent' ? 'Machinery for rent' : L.TYPES[type].label,
       cfg: L.TYPES[type],
       filters,
       filter,
@@ -147,5 +148,7 @@ router.get('/rentals', listRoute('machinery', 'rent'));
 router.get('/machinery/:slug', detailRoute('machinery'));
 router.get('/projects', listRoute('project'));
 router.get('/projects/:slug', detailRoute('project'));
+router.get('/real-estate', listRoute('property'));
+router.get('/real-estate/:slug', detailRoute('property'));
 
 module.exports = router;

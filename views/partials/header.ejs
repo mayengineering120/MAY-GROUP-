@@ -9,7 +9,7 @@
     </a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
     <nav id="site-nav" class="site-nav" aria-label="Main">
-      <% const links = [['/', 'Home'], ['/machinery', 'Machinery'], ['/rentals', 'Rentals'], ['/projects', 'Projects'], ['/about', 'About'], ['/contact', 'Contact']]; %>
+      <% const links = [['/', 'Home'], ['/machinery', 'Machinery'], ['/rentals', 'Rentals'], ['/real-estate', 'Real Estate'], ['/projects', 'Projects'], ['/about', 'About'], ['/contact', 'Contact']]; %>
       <% for (const [href, label] of links) { const active = href === '/' ? path === '/' : path.startsWith(href); %>
         <a href="<%= href %>"<%- active ? ' aria-current="page"' : '' %>><%= label %></a>
       <% } %>

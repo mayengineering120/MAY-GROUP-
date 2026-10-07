@@ -1,4 +1,4 @@
-<% const waText = `Hello ${company.company_name}, I'm interested in ${h.forRent(listing) && !h.forSale(listing) ? 'hiring ' : ''}"${listing.title}". ${siteUrl}${h.listingUrl(listing)}`; %>
+<% const waText = `Hello ${company.company_name}, I'm interested in ${h.forRent(listing) && !h.forSale(listing) ? `${h.rentVerb(listing)} ` : ''}"${listing.title}". ${siteUrl}${h.listingUrl(listing)}`; %>
 <%- include('../partials/header', { metaDescription: listing.summary, ogImage: images[0] ? `/uploads/${images[0].filename}` : null }) %>
 <div class="container">
   <nav class="crumbs small" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/<%= cfg.path %>"><%= cfg.label %></a> / <span><%= listing.title %></span></nav>
@@ -29,7 +29,7 @@
       <% if (listing.summary) { %><p class="lead"><%= listing.summary %></p><% } %>
       <% if (h.forRent(listing) && listing.status !== 'sold') { %>
         <div class="rent-box">
-          <p class="rent-title">Available for rent<% if (listing.status === 'on_rent') { %> <span class="small muted">(currently on rent, ask us when it's free)</span><% } %></p>
+          <p class="rent-title">Available for rent<% if (listing.status === 'on_rent') { %> <span class="small muted">(currently on rent, ask us when it's free)</span><% } %><% if (listing.status === 'rented') { %> <span class="small muted">(currently rented, ask us about availability)</span><% } %></p>
           <% const rates = h.rentRates(listing); %>
           <% if (rates.length) { %>
             <dl class="rates"><% for (const r of rates) { %><div><dt>Per <%= r.period %></dt><dd><%= r.main %><span><%= r.alt %></span></dd></div><% } %></dl>
@@ -43,7 +43,9 @@
       <% } %>
       <% if (listing.status === 'sold' && listing.sold_at) { %><p class="muted small">Sold <%= h.date(listing.sold_at) %></p><% } %>
       <dl class="specs">
-        <% const specs = listing.type === 'machinery'
+        <% const specs = listing.type === 'property'
+          ? [['Property type', listing.category], ['Bedrooms', listing.bedrooms === 0 ? 'Studio' : listing.bedrooms], ['Bathrooms', listing.bathrooms], ['Area', listing.area != null ? `${h.number(listing.area)} sq ft` : ''], ['Location', listing.location], ['Status', STATUS_LABELS[listing.status]]]
+          : listing.type === 'machinery'
           ? [['Category', listing.category], ['Make', listing.make], ['Model', listing.model], ['Year', listing.year], ['Hours', listing.hours != null ? h.number(listing.hours) : ''], ['Condition', listing.condition], ['Location', listing.location]]
           : [['Category', listing.category], ['Client', listing.client], ['Location', listing.location], ['Completed', listing.completed_on], ['Status', STATUS_LABELS[listing.status]]]; %>
         <% for (const [k, v] of specs) { if (v === null || v === undefined || v === '') continue; %>
@@ -51,7 +53,7 @@
         <% } %>
       </dl>
       <% if (listing.status !== 'sold') { %>
-        <a class="btn btn-primary" href="#enquire"><%= h.forRent(listing) && !h.forSale(listing) ? 'Enquire about hiring' : `Enquire about this ${cfg.singular.toLowerCase()}` %></a>
+        <a class="btn btn-primary" href="#enquire"><%= h.forRent(listing) && !h.forSale(listing) ? `Enquire about ${h.rentVerb(listing)}` : `Enquire about this ${cfg.singular.toLowerCase()}` %></a>
         <% if (company.whatsapp) { %><a class="btn btn-whatsapp" href="<%= h.whatsappHref(company.whatsapp, waText) %>" target="_blank" rel="noopener"><%- include('../partials/whatsapp-icon') %> WhatsApp us</a><% } %>
         <% const mainPhone = h.phones(company.phone)[0]; if (mainPhone) { %><a class="btn btn-ghost" href="<%= h.telHref(mainPhone) %>">Call <%= mainPhone %></a><% } %>
       <% } %>
