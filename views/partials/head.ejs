@@ -13,6 +13,7 @@
   <meta name="robots" content="noindex, nofollow">
   <% } else { %>
   <link rel="canonical" href="<%= siteUrl + path %>">
+  <% if (company.google_site_verification) { %><meta name="google-site-verification" content="<%= company.google_site_verification %>"><% } %>
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="<%= company.company_name %>">
   <meta property="og:title" content="<%= title || company.company_name %>">

@@ -34,6 +34,15 @@
       <div class="alert alert-warning small">Email sending is not switched on yet. Enquiries are still saved under <a href="/staff/enquiries">Enquiries</a>. To receive them by email, the person hosting the website must add the email settings (SMTP) described in the README.</div>
     <% } %>
   </fieldset>
+  <fieldset id="google">
+    <legend>Google Search</legend>
+    <p class="small muted">To get MAY Group onto Google faster: in <a href="https://search.google.com/search-console" target="_blank" rel="noopener">Google Search Console</a>
+      add your website address as a <strong>URL prefix</strong> property, choose <strong>HTML tag</strong>, copy the tag and paste it here, save,
+      then press <strong>Verify</strong> in Google. Afterwards, submit <strong><%= siteUrl %>/sitemap.xml</strong> under <em>Sitemaps</em>.</p>
+    <label class="field">Google verification tag <span class="optional">(the whole &lt;meta …&gt; tag, or just the code)</span>
+      <input name="google_site_verification" maxlength="300" value="<%= settings.google_site_verification %>" placeholder='&lt;meta name="google-site-verification" content="…" /&gt;'></label>
+    <% if (settings.google_site_verification) { %><p class="small"><span class="badge badge-inline badge-available">Added</span> The tag is on your website. Press Verify in Google Search Console.</p><% } %>
+  </fieldset>
   <fieldset>
     <legend>Other</legend>
     <div class="field-row">

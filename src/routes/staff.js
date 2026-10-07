@@ -298,6 +298,18 @@ router.post('/company', requireAdmin, verifyCsrf, (req, res) => {
   if (!CURRENCIES.includes(values.default_currency)) delete values.default_currency;
   const emails = mailer.parseAddresses(values.notify_email);
   values.notify_email = emails.join(', ');
+  if ('google_site_verification' in values) {
+    // Accept the whole <meta ...> tag Google shows, or just its code.
+    const raw = String(values.google_site_verification).trim();
+    const code = (raw.match(/content=["']?([^"'\s>]+)/i)?.[1] || raw).trim();
+    values.google_site_verification = /^[\w-]{10,200}$/.test(code) ? code : '';
+    if (raw && !values.google_site_verification) {
+      flash(req, 'error', "That Google verification code doesn't look right. Paste the whole tag Google shows you.");
+      delete values.google_site_verification;
+      saveSettings(values);
+      return res.redirect('/staff/company#google');
+    }
+  }
   saveSettings(values);
   flash(req, 'success', 'Company details saved. They now appear across the website.');
   res.redirect('/staff/company');

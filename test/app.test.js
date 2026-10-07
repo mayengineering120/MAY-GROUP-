@@ -234,6 +234,17 @@ test('search engines get robots.txt, a sitemap of public pages, and no staff pag
   assert.match((await staff.get('/staff')).body, /<meta name="robots" content="noindex, nofollow">/);
 });
 
+test('admin can paste the Google Search Console verification tag', async () => {
+  const _csrf = await admin.csrf('/staff/company');
+  const tag = '<meta name="google-site-verification" content="AbC123_xyz-987654321" />';
+  await admin.post('/staff/company', { _csrf, google_site_verification: tag });
+  assert.match((await visitor.get('/')).body, /<meta name="google-site-verification" content="AbC123_xyz-987654321">/);
+  await admin.post('/staff/company', { _csrf, google_site_verification: '"><script>alert(1)</script>' });
+  const home = (await visitor.get('/')).body;
+  assert.doesNotMatch(home, /<script>alert/);
+  assert.match(home, /content="AbC123_xyz-987654321"/, 'an invalid paste keeps the previous code');
+});
+
 test('only admins can delete listings', async () => {
   const _csrf = await staff.csrf('/staff/machinery');
   assert.strictEqual((await staff.post(`/staff/machinery/${machineId}/delete`, { _csrf })).status, 403);

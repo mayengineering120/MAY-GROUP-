@@ -106,6 +106,7 @@ const DEFAULT_SETTINGS = {
   hours: 'Sunday – Thursday: 7:00 AM – 6:00 PM\nFriday & Saturday: Closed',
   default_currency: 'AED',
   registration: 'SMC-Private Limited',
+  google_site_verification: '',
 };
 // Migrations for databases created by earlier versions.
 const listingCols = db.prepare('PRAGMA table_info(listings)').all().map((c) => c.name);
