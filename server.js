@@ -22,6 +22,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// Health check for the hosting platform (no session or database work).
+app.get('/healthz', (req, res) => res.type('text').send('ok'));
+
 app.use('/static', express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
 app.use('/uploads', express.static(UPLOAD_DIR, { maxAge: '7d', fallthrough: false }));
 app.use(express.urlencoded({ extended: false, limit: '200kb' }));

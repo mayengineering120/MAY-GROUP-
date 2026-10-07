@@ -1,0 +1,40 @@
+# One-click deployment on Render (https://render.com). See README → "Putting it online".
+services:
+  - type: web
+    name: may-group-website
+    runtime: node
+    # "starter" is required for the persistent disk that stores the database and photos.
+    plan: starter
+    region: frankfurt
+    buildCommand: npm ci --omit=dev
+    startCommand: npm start
+    healthCheckPath: /healthz
+    autoDeploy: true
+    disk:
+      name: may-group-data
+      mountPath: /var/data
+      sizeGB: 5
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: TRUST_PROXY
+        value: "true"
+      - key: DATA_DIR
+        value: /var/data
+      - key: UPLOAD_DIR
+        value: /var/data/uploads
+      # Enquiry emails via Gmail. SMTP_PASS is the 16-character Google App password.
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "465"
+      - key: SMTP_USER
+        value: musbahalyaqootengineering@gmail.com
+      - key: SMTP_PASS
+        sync: false
+      - key: SITE_URL
+        sync: false

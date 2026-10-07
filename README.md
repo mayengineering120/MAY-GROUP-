@@ -70,12 +70,34 @@ Any other email provider works too, using its SMTP settings.
 
 ## Putting it online
 
-It runs on any Node.js host (Render, Railway, Fly.io, a VPS, etc.):
+### Option A: one click on Render (recommended)
 
-1. Set the environment variables from `.env.example`. **`SESSION_SECRET` is required** in production.
-2. Make sure `DATA_DIR` and `UPLOAD_DIR` point to a **persistent disk**: they hold the database and photos.
-3. Serve it over **HTTPS** (with `NODE_ENV=production`, login cookies are only sent over HTTPS).
-4. **Back up** the `DATA_DIR` and `UPLOAD_DIR` folders regularly.
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/mayengineering120/MAY-GROUP-)
+
+1. Click the button, then sign up or log in to Render (use "Sign in with GitHub").
+2. Render reads `render.yaml` and asks for two values:
+   - **SMTP_PASS**: the Gmail App password (see *Receiving enquiries by email*). You can leave it empty and add it later.
+   - **SITE_URL**: e.g. `https://may-group-website.onrender.com`, or your own domain later.
+3. Click **Apply**. After a few minutes the site is live at `https://may-group-website.onrender.com`.
+4. Open `/staff` on the live site straight away and create the administrator account.
+5. Optional: add your own domain (e.g. `maygroup.ae`) under the service's **Settings → Custom Domains**.
+
+Cost: Render's *Starter* plan (about US$7/month) plus a 5 GB disk (about US$1–2/month). The disk is required:
+it keeps the database and photos safe across updates. Every push to the default branch redeploys the site.
+
+### Option B: any other host
+Use the `Dockerfile` (mount a persistent volume at `/var/data`) or run `npm ci && npm start` on any
+Node.js 22+ server. Set the variables from `.env.example`; `SESSION_SECRET` is required, and serve over HTTPS.
+
+**Back up** the data folder (database + `uploads/`) regularly. On Render, use the disk's snapshots.
+
+## Making changes later with Claude
+
+- **Day-to-day content** (machines, rentals, projects, photos, phone numbers, opening hours, CEO,
+  about text, staff accounts): use the **staff portal** at `/staff`. Changes appear instantly.
+- **Design or new features**: open this repository in Claude Code (https://claude.ai/code), select
+  `mayengineering120/MAY-GROUP-`, and describe the change in your own words. Claude edits the code, tests it,
+  and pushes; Render redeploys automatically within a few minutes. `CLAUDE.md` gives Claude the background.
 
 ## Security
 
