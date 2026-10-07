@@ -234,6 +234,10 @@ test('search engines get robots.txt, a sitemap of public pages, and no staff pag
   assert.match((await staff.get('/staff')).body, /<meta name="robots" content="noindex, nofollow">/);
 });
 
+test('the Google Search Console verification tag is on the site by default', async () => {
+  assert.match((await visitor.get('/')).body, /<meta name="google-site-verification" content="U8PTb60tKA2z4aFeILfI75LvMjoYAQfW6cKGG-M17Is">/);
+});
+
 test('admin can paste the Google Search Console verification tag', async () => {
   const _csrf = await admin.csrf('/staff/company');
   const tag = '<meta name="google-site-verification" content="AbC123_xyz-987654321" />';

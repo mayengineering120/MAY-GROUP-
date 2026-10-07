@@ -21,8 +21,8 @@ Company details (name, phones, hours, CEO, about text, email addresses), listing
 staff accounts live in the **database on the server**, edited through the staff portal.
 Changing `DEFAULT_SETTINGS` in `src/db.js` only affects brand-new installs, **not the live site**.
 When the owner asks to change such content, tell them where to change it in the staff portal
-(Company details / Machinery / Projects / Staff accounts), or, if they want it done in code, add a
-one-off migration in `src/db.js` that updates the setting.
+(Company details / Machinery / Projects / Staff accounts), or, if they want it done in code, add an
+entry to `ONE_OFF_MIGRATIONS` in `src/db.js` (runs once on the live site) and update `DEFAULT_SETTINGS` too.
 
 ## Rules
 - Every form POST needs `<input type="hidden" name="_csrf" value="<%= csrf() %>">` and `verifyCsrf`

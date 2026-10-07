@@ -106,7 +106,7 @@ const DEFAULT_SETTINGS = {
   hours: 'Sunday – Thursday: 7:00 AM – 6:00 PM\nFriday & Saturday: Closed',
   default_currency: 'AED',
   registration: 'SMC-Private Limited',
-  google_site_verification: '',
+  google_site_verification: 'U8PTb60tKA2z4aFeILfI75LvMjoYAQfW6cKGG-M17Is',
 };
 // Migrations for databases created by earlier versions.
 const listingCols = db.prepare('PRAGMA table_info(listings)').all().map((c) => c.name);
@@ -122,6 +122,19 @@ db.exec("DELETE FROM settings WHERE key = 'currency'");
 
 const insertSetting = db.prepare('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)');
 for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) insertSetting.run(key, value);
+
+// One-off content changes for the live site. Each runs once, ever; add new ones at the end
+// (settings changed this way can still be edited afterwards in the staff portal).
+db.exec(`CREATE TABLE IF NOT EXISTS migrations (name TEXT PRIMARY KEY, ran_at TEXT NOT NULL DEFAULT (datetime('now')))`);
+const ONE_OFF_MIGRATIONS = {
+  '2026-10-google-search-console': () =>
+    db.prepare("UPDATE settings SET value = ? WHERE key = 'google_site_verification' AND value = ''").run('U8PTb60tKA2z4aFeILfI75LvMjoYAQfW6cKGG-M17Is'),
+};
+for (const [name, run] of Object.entries(ONE_OFF_MIGRATIONS)) {
+  if (db.prepare('SELECT 1 FROM migrations WHERE name = ?').get(name)) continue;
+  run();
+  db.prepare('INSERT INTO migrations (name) VALUES (?)').run(name);
+}
 
 function getSettings() {
   const rows = db.prepare('SELECT key, value FROM settings').all();
