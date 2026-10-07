@@ -93,11 +93,12 @@ const DEFAULT_SETTINGS = {
     'We supply quality new and used machinery and deliver engineering projects for our clients.\n\n' +
     'Edit this text from the staff portal under Company Details.',
   services: 'Engineering\nHeavy equipment\nMachinery trading\nEquipment sourcing',
-  phone: '',
+  ceo_name: 'Ghalib Darwish',
+  phone: '+971 7378304\n+971 7865596\n+92 332 7378305',
   email: 'musbahalyaqootengineering@gmail.com',
   notify_email: 'musbahalyaqootengineering@gmail.com',
   address: '',
-  hours: '',
+  hours: 'Sunday – Thursday: 7:00 AM – 6:00 PM\nFriday & Saturday: Closed',
   default_currency: 'AED',
   registration: 'SMC-Private Limited',
 };

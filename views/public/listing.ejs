@@ -41,7 +41,7 @@
       </dl>
       <% if (listing.status !== 'sold') { %>
         <a class="btn btn-primary" href="#enquire">Enquire about this <%= cfg.singular.toLowerCase() %></a>
-        <% if (company.phone) { %><a class="btn btn-ghost" href="<%= h.telHref(company.phone) %>">Call <%= company.phone %></a><% } %>
+        <% const mainPhone = h.phones(company.phone)[0]; if (mainPhone) { %><a class="btn btn-ghost" href="<%= h.telHref(mainPhone) %>">Call <%= mainPhone %></a><% } %>
       <% } %>
     </div>
   </div>

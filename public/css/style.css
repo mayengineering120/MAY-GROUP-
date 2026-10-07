@@ -230,6 +230,7 @@ fieldset.internal { background: #fffbef; border-color: #f0dca6; }
 .tile-value { font-size: 2rem; font-weight: 800; }
 .tile-value small { font-size: .9rem; font-weight: 500; color: var(--muted); }
 .tile-alert { border-color: var(--accent); background: #fbf6ea; }
+.ceo-line { color: var(--ink-2); border-left: 3px solid var(--accent); padding-left: 12px; }
 .about-logo { width: 180px; height: auto; margin: 0 auto 20px; }
 .quick-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
 .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }

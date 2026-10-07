@@ -66,6 +66,15 @@ test('first run redirects to setup and creates an admin', async () => {
   assert.strictEqual((await visitor.get('/staff/setup')).location, '/staff/login');
 });
 
+test('default company details show the CEO, phone numbers and opening hours', async () => {
+  const about = await visitor.get('/about');
+  assert.match(about.body, /Ghalib Darwish/);
+  for (const n of ['+971 7378304', '+971 7865596', '+92 332 7378305']) assert.ok(about.body.includes(n), n);
+  assert.match(about.body, /href="tel:\+923327378305"/);
+  assert.match(about.body, /7:00 AM – 6:00 PM/);
+  assert.match(about.body, /Friday &amp; Saturday: Closed/);
+});
+
 test('posts without a CSRF token are rejected', async () => {
   const res = await admin.post('/staff/company', { company_name: 'Hacked' });
   assert.strictEqual(res.status, 403);

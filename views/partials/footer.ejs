@@ -18,10 +18,10 @@
     <div>
       <p class="footer-heading">Contact</p>
       <ul class="plain">
-        <% if (company.phone) { %><li><a href="<%= h.telHref(company.phone) %>"><%= company.phone %></a></li><% } %>
+        <% for (const ph of h.phones(company.phone)) { %><li><a href="<%= h.telHref(ph) %>"><%= ph %></a></li><% } %>
         <% if (company.email) { %><li><a href="mailto:<%= company.email %>"><%= company.email %></a></li><% } %>
         <% if (company.address) { %><li class="muted"><%= company.address %></li><% } %>
-        <% if (company.hours) { %><li class="muted"><%= company.hours %></li><% } %>
+        <% for (const l of h.lines(company.hours)) { %><li class="muted"><%= l %></li><% } %>
       </ul>
     </div>
   </div>

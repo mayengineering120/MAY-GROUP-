@@ -13,10 +13,11 @@
       <% } %>
       <h2 class="h3">Company details</h2>
       <dl class="details">
+        <% if (company.ceo_name) { %><dt>CEO</dt><dd><%= company.ceo_name %></dd><% } %>
         <% if (company.address) { %><dt>Address</dt><dd><%= company.address %></dd><% } %>
-        <% if (company.phone) { %><dt>Phone</dt><dd><a href="<%= h.telHref(company.phone) %>"><%= company.phone %></a></dd><% } %>
+        <% if (h.phones(company.phone).length) { %><dt>Phone</dt><dd><% for (const ph of h.phones(company.phone)) { %><a href="<%= h.telHref(ph) %>"><%= ph %></a><br><% } %></dd><% } %>
         <% if (company.email) { %><dt>Email</dt><dd><a href="mailto:<%= company.email %>"><%= company.email %></a></dd><% } %>
-        <% if (company.hours) { %><dt>Opening hours</dt><dd><%= company.hours %></dd><% } %>
+        <% if (company.hours) { %><dt>Opening hours</dt><dd><% for (const l of h.lines(company.hours)) { %><%= l %><br><% } %></dd><% } %>
         <% if (company.registration) { %><dt>Registration</dt><dd><%= company.registration %></dd><% } %>
       </dl>
       <a class="btn btn-primary" href="/contact">Contact us</a>

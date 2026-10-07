@@ -34,6 +34,7 @@
     <div>
       <h2>About <%= company.company_name %></h2>
       <% for (const p of h.paragraphs(company.about).slice(0, 2)) { %><p><%= p %></p><% } %>
+      <% if (company.ceo_name) { %><p class="ceo-line">Led by <strong><%= company.ceo_name %></strong>, Chief Executive Officer</p><% } %>
       <a class="btn btn-ghost" href="/about">More about us</a>
     </div>
     <% const services = h.lines(company.services); if (services.length) { %>

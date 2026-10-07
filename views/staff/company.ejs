@@ -9,6 +9,7 @@
       <label class="field">Company name <input name="company_name" required maxlength="100" value="<%= settings.company_name %>"></label>
       <label class="field">Trading / full name <span class="optional">(shown under the name)</span><input name="subtitle" maxlength="100" value="<%= settings.subtitle %>"></label>
     </div>
+    <label class="field">CEO name <span class="optional">(shown on the home and About pages; leave empty to hide)</span><input name="ceo_name" maxlength="100" value="<%= settings.ceo_name %>"></label>
     <label class="field">Tagline <span class="optional">(the headline on the home page)</span><input name="tagline" maxlength="200" value="<%= settings.tagline %>"></label>
     <label class="field">About the company <span class="optional">(leave a blank line between paragraphs)</span><textarea name="about" rows="8"><%= settings.about %></textarea></label>
     <label class="field">Services <span class="optional">(one per line)</span><textarea name="services" rows="5"><%= settings.services %></textarea></label>
@@ -16,11 +17,11 @@
   <fieldset>
     <legend>Contact</legend>
     <div class="field-row">
-      <label class="field">Phone <input name="phone" maxlength="50" value="<%= settings.phone %>"></label>
+      <label class="field">Phone numbers <span class="optional">(one per line; the first is used for “Call” buttons)</span><textarea name="phone" rows="3" maxlength="300"><%= settings.phone %></textarea></label>
       <label class="field">Public email <span class="optional">(shown on the website)</span><input name="email" type="email" maxlength="200" value="<%= settings.email %>"></label>
     </div>
     <label class="field">Address <input name="address" maxlength="300" value="<%= settings.address %>"></label>
-    <label class="field">Opening hours <input name="hours" maxlength="200" value="<%= settings.hours %>"></label>
+    <label class="field">Opening hours <span class="optional">(one line per row)</span><textarea name="hours" rows="3" maxlength="300"><%= settings.hours %></textarea></label>
   </fieldset>
   <fieldset id="email-notifications">
     <legend>Enquiry email notifications</legend>

@@ -55,6 +55,14 @@ function lines(text) {
     .filter(Boolean);
 }
 
+/** Split a list of phone numbers (one per line or comma-separated). */
+function phones(text) {
+  return String(text || '')
+    .split(/[\n,;]+/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+}
+
 function listingUrl(listing) {
   return `/${listing.type === 'machinery' ? 'machinery' : 'projects'}/${listing.slug}`;
 }
@@ -64,5 +72,5 @@ function telHref(phone) {
 }
 
 module.exports = {
-  AED_PER_USD, CURRENCIES, CURRENCY_LABELS, money, price, priceAlt, number, date, paragraphs, lines, listingUrl, telHref,
+  AED_PER_USD, CURRENCIES, CURRENCY_LABELS, money, price, priceAlt, number, date, paragraphs, lines, phones, listingUrl, telHref,
 };
