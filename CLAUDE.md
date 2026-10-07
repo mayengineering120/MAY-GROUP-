@@ -41,5 +41,6 @@ To look at pages: `npm start`, open http://localhost:3000 (first visit to /staff
 
 ## Deployment
 Render blueprint in `render.yaml` (web service + persistent disk at `/var/data`, auto-deploy on push).
-Secrets (`SESSION_SECRET`, `SMTP_PASS`) are set in the Render dashboard; never commit them.
+Alternative: Railway (`railway.json` + `Dockerfile`, volume at `/var/data`). Secrets (`SESSION_SECRET`, `SMTP_PASS`)
+are set in the host dashboard; never commit them. Without `SESSION_SECRET` a secret is generated into `DATA_DIR`.
 This repository is public.

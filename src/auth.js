@@ -1,7 +1,9 @@
 const crypto = require('node:crypto');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
-const { db } = require('./db');
+const fs = require('node:fs');
+const path = require('node:path');
+const { db, DATA_DIR } = require('./db');
 
 /** express-session store backed by the SQLite database, so logins survive restarts. */
 class SqliteStore extends session.Store {
@@ -45,13 +47,20 @@ class SqliteStore extends session.Store {
   }
 }
 
-function sessionMiddleware() {
-  let secret = process.env.SESSION_SECRET;
-  if (!secret) {
-    if (process.env.NODE_ENV === 'production') throw new Error('SESSION_SECRET must be set in production.');
-    secret = crypto.randomBytes(32).toString('hex');
-    console.warn('SESSION_SECRET not set: using a random one (staff will be logged out on restart).');
+/** Without SESSION_SECRET, generate one once and keep it in the data folder so logins survive restarts. */
+function persistentSecret() {
+  const file = path.join(DATA_DIR, 'session-secret');
+  try {
+    return fs.readFileSync(file, 'utf8').trim();
+  } catch {
+    const secret = crypto.randomBytes(32).toString('hex');
+    fs.writeFileSync(file, secret, { mode: 0o600 });
+    return secret;
   }
+}
+
+function sessionMiddleware() {
+  const secret = process.env.SESSION_SECRET || persistentSecret();
   return session({
     name: 'may.sid',
     secret,

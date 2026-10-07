@@ -86,9 +86,22 @@ Any other email provider works too, using its SMTP settings.
 Cost: Render's *Starter* plan (about US$7/month) plus a 5 GB disk (about US$1–2/month). The disk is required:
 it keeps the database and photos safe across updates. Every push to the default branch redeploys the site.
 
-### Option B: any other host
+### Option B: Railway (if Render doesn't work for you)
+
+1. Go to https://railway.com, click **Login → Login with GitHub**, and approve access.
+2. Click **New Project → Deploy from GitHub repo** and choose **MAY-GROUP-**. Railway builds it using the `Dockerfile`.
+3. Add storage for the database and photos: right-click the project canvas (or click **+ Create**) and choose
+   **Volume**, attach it to the website service, and set the mount path to **`/var/data`**.
+4. Open the service, go to **Settings → Networking → Generate Domain**. That address is your website.
+5. Open `<your address>/staff` straight away and create the administrator account.
+6. Optional, for enquiry emails: under **Variables** add `SMTP_HOST=smtp.gmail.com`, `SMTP_PORT=465`,
+   `SMTP_USER=musbahalyaqootengineering@gmail.com`, `SMTP_PASS=<app password>` and `SITE_URL=<your address>`.
+
+Cost: Railway's Hobby plan, about US$5/month including normal usage. Every push to the default branch redeploys.
+
+### Option C: any other host
 Use the `Dockerfile` (mount a persistent volume at `/var/data`) or run `npm ci && npm start` on any
-Node.js 22+ server. Set the variables from `.env.example`; `SESSION_SECRET` is required, and serve over HTTPS.
+Node.js 22+ server, behind HTTPS. `SESSION_SECRET` is optional; if it isn't set, one is generated and kept in the data folder.
 
 **Back up** the data folder (database + `uploads/`) regularly. On Render, use the disk's snapshots.
 
