@@ -8,7 +8,10 @@
   </div>
   <label class="field">Email <input name="email" type="email" required maxlength="200" autocomplete="email" value="<%= form.email || '' %>"></label>
   <label class="field">Message
-    <textarea name="message" rows="5" required maxlength="5000"><%= form.message || (listing ? `Hello, I'm interested in "${listing.title}". Please send me more details.` : '') %></textarea>
+    <textarea name="message" rows="5" required maxlength="5000"><%= form.message || (!listing ? ''
+      : h.forRent(listing) && !h.forSale(listing) ? `Hello, I'd like to hire "${listing.title}". Start date: \nHow long for: \nSite location: \nPlease confirm availability and rates.`
+      : h.forRent(listing) ? `Hello, I'm interested in buying or hiring "${listing.title}". Please send me more details.`
+      : `Hello, I'm interested in "${listing.title}". Please send me more details.`) %></textarea>
   </label>
   <button class="btn btn-primary" type="submit">Send enquiry</button>
 </form>

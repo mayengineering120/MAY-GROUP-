@@ -39,6 +39,10 @@ CREATE TABLE IF NOT EXISTS listings (
   location         TEXT NOT NULL DEFAULT '',
   price            REAL,
   price_currency   TEXT NOT NULL DEFAULT 'AED',
+  offer_type       TEXT NOT NULL DEFAULT 'sale',
+  rent_day         REAL,
+  rent_week        REAL,
+  rent_month       REAL,
   price_on_request INTEGER NOT NULL DEFAULT 0,
   make             TEXT NOT NULL DEFAULT '',
   model            TEXT NOT NULL DEFAULT '',
@@ -90,9 +94,9 @@ const DEFAULT_SETTINGS = {
   tagline: 'Engineering | Heavy Equipment | Machinery Trading',
   about:
     'MAY Group (Musbah Al Yaqoot) is an engineering, heavy equipment and machinery trading company. ' +
-    'We supply quality new and used machinery and deliver engineering projects for our clients.\n\n' +
+    'We sell and rent out quality machinery and deliver engineering projects for our clients.\n\n' +
     'Edit this text from the staff portal under Company Details.',
-  services: 'Engineering\nHeavy equipment\nMachinery trading\nEquipment sourcing',
+  services: 'Engineering\nHeavy equipment\nMachinery trading\nMachinery rental\nEquipment sourcing',
   ceo_name: 'Ghalib Darwish',
   phone: '+971 7378304\n+971 7865596\n+92 332 7378305',
   email: 'musbahalyaqootengineering@gmail.com',
@@ -104,9 +108,14 @@ const DEFAULT_SETTINGS = {
 };
 // Migrations for databases created by earlier versions.
 const listingCols = db.prepare('PRAGMA table_info(listings)').all().map((c) => c.name);
-if (!listingCols.includes('price_currency')) {
-  db.exec("ALTER TABLE listings ADD COLUMN price_currency TEXT NOT NULL DEFAULT 'AED'");
-}
+const addColumn = (name, def) => {
+  if (!listingCols.includes(name)) db.exec(`ALTER TABLE listings ADD COLUMN ${name} ${def}`);
+};
+addColumn('price_currency', "TEXT NOT NULL DEFAULT 'AED'");
+addColumn('offer_type', "TEXT NOT NULL DEFAULT 'sale'");
+addColumn('rent_day', 'REAL');
+addColumn('rent_week', 'REAL');
+addColumn('rent_month', 'REAL');
 db.exec("DELETE FROM settings WHERE key = 'currency'");
 
 const insertSetting = db.prepare('INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)');

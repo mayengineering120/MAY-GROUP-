@@ -1,15 +1,17 @@
 <%- include('../partials/header') %>
 <section class="page-head">
   <div class="container">
-    <h1><%= cfg.label %></h1>
-    <p class="lead"><%= cfg.key === 'machinery' ? 'Quality machinery ready to work. Browse what is available now, or see what we have recently sold.' : 'Projects available for sale, and a look at the work we have delivered.' %></p>
+    <h1><%= title %></h1>
+    <p class="lead"><%= filter.key === 'rent' ? 'Hire well-maintained machinery by the day, week or month. Contact us for availability and long-term rates.'
+      : cfg.key === 'machinery' ? 'Quality machinery ready to work. Buy or rent, or see what we have recently sold.'
+      : 'Projects available for sale, and a look at the work we have delivered.' %></p>
   </div>
 </section>
 <section class="section">
   <div class="container">
     <nav class="tabs" aria-label="Filter by status">
       <% for (const f of filters) { %>
-        <a href="?status=<%= f.key %>"<%- f.key === filter.key ? ' aria-current="true"' : '' %>><%= f.label %></a>
+        <a href="<%= f.key === 'rent' ? '/rentals' : `/${cfg.path}?status=${f.key}` %>"<%- f.key === filter.key ? ' aria-current="true"' : '' %>><%= f.label %></a>
       <% } %>
     </nav>
     <form class="toolbar" method="get">

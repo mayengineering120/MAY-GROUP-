@@ -6,6 +6,7 @@
       <div class="placeholder" aria-hidden="true"><%= item.type === 'machinery' ? 'No photo yet' : 'Project' %></div>
     <% } %>
     <span class="badge badge-<%= item.status %>"><%= STATUS_LABELS[item.status] %></span>
+    <% if (h.forRent(item) && item.status !== 'sold') { %><span class="badge badge-offer"><%= item.offer_type === 'both' ? 'Sale & rent' : 'For rent' %></span><% } %>
   </div>
   <div class="card-body">
     <h3 class="card-title"><%= item.title %></h3>
@@ -17,7 +18,11 @@
       <% } %>
     </p>
     <% if (item.summary) { %><p class="card-summary"><%= item.summary %></p><% } %>
-    <% if (item.type === 'machinery' || ['available', 'under_offer', 'sold'].includes(item.status)) { %>
+    <% const rate = h.rentRates(item)[0]; %>
+    <% if (h.forRent(item) && item.status !== 'sold') { %>
+      <p class="card-rent<%= h.forSale(item) ? ' card-rent-secondary' : '' %>"><% if (rate) { %><%= h.forSale(item) ? 'Rent from ' : '' %><strong><%= rate.main %></strong> / <%= rate.period %><% if (!h.forSale(item)) { %> <span class="card-price-alt"><%= rate.alt %></span><% } %><% } else { %>Rental rates on request<% } %></p>
+    <% } %>
+    <% if ((h.forSale(item) || item.status === 'sold') && (item.type === 'machinery' || ['available', 'under_offer', 'sold'].includes(item.status))) { %>
       <p class="card-price<%= item.status === 'sold' ? ' is-sold' : '' %>"><%= h.price(item) %><% if (h.priceAlt(item)) { %> <span class="card-price-alt"><%= h.priceAlt(item) %></span><% } %></p>
     <% } %>
   </div>

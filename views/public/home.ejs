@@ -5,10 +5,12 @@
     <h1><%= company.tagline %></h1>
     <div class="hero-actions">
       <a class="btn btn-primary" href="/machinery">Browse machinery</a>
+      <a class="btn btn-ghost" href="/rentals">Rent machinery</a>
       <a class="btn btn-ghost" href="/projects">View our projects</a>
     </div>
     <dl class="stats">
       <div><dt>Machines available</dt><dd><%= stats.machines_available || 0 %></dd></div>
+      <div><dt>Machines for rent</dt><dd><%= stats.machines_for_rent || 0 %></dd></div>
       <div><dt>Projects delivered</dt><dd><%= stats.projects_delivered || 0 %></dd></div>
       <div><dt>Items sold</dt><dd><%= stats.sold || 0 %></dd></div>
     </dl>
@@ -18,8 +20,8 @@
 <section class="section">
   <div class="container">
     <div class="section-head">
-      <h2>Machinery available now</h2>
-      <a href="/machinery">See all machinery &rarr;</a>
+      <h2>Machinery for sale</h2>
+      <a href="/machinery">See all machinery for sale &rarr;</a>
     </div>
     <% if (machinery.length) { %>
       <div class="grid"><% for (const item of machinery) { %><%- include('../partials/card', { item }) %><% } %></div>
@@ -28,6 +30,19 @@
     <% } %>
   </div>
 </section>
+
+<% if (rentals.length) { %>
+<section class="section section-tight-top">
+  <div class="container">
+    <div class="section-head">
+      <h2>Machinery for rent</h2>
+      <a href="/rentals">See all rentals &rarr;</a>
+    </div>
+    <p class="muted">Daily, weekly and monthly hire. Ask us about long-term rates.</p>
+    <div class="grid"><% for (const item of rentals) { %><%- include('../partials/card', { item }) %><% } %></div>
+  </div>
+</section>
+<% } %>
 
 <section class="section section-alt">
   <div class="container split">

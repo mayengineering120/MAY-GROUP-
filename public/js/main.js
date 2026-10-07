@@ -25,3 +25,15 @@ document.addEventListener('click', (event) => {
   const el = event.target.closest('[data-confirm]');
   if (el && !window.confirm(el.dataset.confirm)) event.preventDefault();
 });
+
+// Listing form: show sale-price or rental-rate fields to match "Sale or rent"
+const offerRadios = document.querySelectorAll('input[name="offer_type"]');
+function syncOfferFields() {
+  const checked = document.querySelector('input[name="offer_type"]:checked');
+  if (!checked) return;
+  document.querySelectorAll('[data-offer]').forEach((el) => {
+    el.hidden = checked.value !== 'both' && el.dataset.offer !== checked.value;
+  });
+}
+offerRadios.forEach((r) => r.addEventListener('change', syncOfferFields));
+syncOfferFields();

@@ -10,6 +10,7 @@ const { CURRENCIES } = require('./helpers');
 const STATUS_LABELS = {
   available: 'Available',
   under_offer: 'Under offer',
+  on_rent: 'On rent',
   sold: 'Sold',
   ongoing: 'Ongoing',
   completed: 'Completed',
@@ -21,7 +22,8 @@ const TYPES = {
     label: 'Machinery',
     singular: 'Machine',
     path: 'machinery',
-    statuses: ['available', 'under_offer', 'sold'],
+    // "on_rent" means currently hired out to a customer; it comes back as available afterwards.
+    statuses: ['available', 'under_offer', 'on_rent', 'sold'],
   },
   project: {
     key: 'project',
@@ -33,10 +35,14 @@ const TYPES = {
   },
 };
 
-// Public filter tabs: each maps to a set of statuses.
+// Machinery can be offered for sale, for rent, or both.
+const OFFER_TYPES = { sale: 'For sale', rent: 'For rent', both: 'For sale & rent' };
+
+// Public filter tabs: each maps to a set of statuses (and, for machinery, offer types).
 const FILTERS = {
   machinery: [
-    { key: 'available', label: 'Available', statuses: ['available', 'under_offer'] },
+    { key: 'available', label: 'For sale', statuses: ['available', 'under_offer'], offerTypes: ['sale', 'both'] },
+    { key: 'rent', label: 'For rent', statuses: ['available', 'under_offer', 'on_rent'], offerTypes: ['rent', 'both'] },
     { key: 'sold', label: 'Sold', statuses: ['sold'] },
     { key: 'all', label: 'All', statuses: TYPES.machinery.statuses },
   ],
@@ -88,6 +94,10 @@ function search(opts = {}) {
   if (opts.statuses?.length) {
     where.push(`status IN (${opts.statuses.map(() => '?').join(',')})`);
     params.push(...opts.statuses);
+  }
+  if (opts.offerTypes?.length) {
+    where.push(`offer_type IN (${opts.offerTypes.map(() => '?').join(',')})`);
+    params.push(...opts.offerTypes);
   }
   if (opts.publishedOnly) where.push('published = 1');
   if (opts.featured) where.push('featured = 1');
@@ -156,6 +166,10 @@ function fromForm(type, body) {
     location: str(body.location, 200),
     price: toPrice(body.price),
     price_currency: CURRENCIES.includes(body.price_currency) ? body.price_currency : 'AED',
+    offer_type: type === 'machinery' && OFFER_TYPES[body.offer_type] ? body.offer_type : 'sale',
+    rent_day: type === 'machinery' ? toPrice(body.rent_day) : null,
+    rent_week: type === 'machinery' ? toPrice(body.rent_week) : null,
+    rent_month: type === 'machinery' ? toPrice(body.rent_month) : null,
     price_on_request: body.price_on_request ? 1 : 0,
     make: str(body.make, 100),
     model: str(body.model, 100),
@@ -175,7 +189,7 @@ function fromForm(type, body) {
 
 const FIELDS = [
   'title', 'category', 'status', 'published', 'featured', 'summary', 'description', 'location', 'price',
-  'price_currency', 'price_on_request', 'make', 'model', 'year', 'hours', 'condition', 'client', 'completed_on', 'internal_notes',
+  'price_currency', 'price_on_request', 'offer_type', 'rent_day', 'rent_week', 'rent_month', 'make', 'model', 'year', 'hours', 'condition', 'client', 'completed_on', 'internal_notes',
 ];
 
 function create(type, data, userId) {
@@ -248,7 +262,7 @@ function remove(id) {
 }
 
 module.exports = {
-  TYPES, FILTERS, STATUS_LABELS, UPLOAD_DIR,
+  TYPES, FILTERS, STATUS_LABELS, OFFER_TYPES, UPLOAD_DIR,
   search, categories, findById, findBySlug, images, fromForm, create, update, setStatus,
   addImages, removeImage, makeCover, remove, slugify, unlinkUpload,
 };

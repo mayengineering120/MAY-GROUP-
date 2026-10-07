@@ -155,6 +155,35 @@ test('marking as sold moves it to the Sold filter', async () => {
   assert.match(sold.body, /badge-sold/);
 });
 
+test('machinery for rent shows on Rentals with rates, and can be marked on rent', async () => {
+  const fd = new FormData();
+  fd.append('_csrf', await staff.csrf('/staff/machinery/new'));
+  fd.append('title', 'Liebherr Mobile Crane');
+  fd.append('offer_type', 'rent');
+  fd.append('price_currency', 'AED');
+  fd.append('rent_day', '1500');
+  fd.append('rent_month', '30000');
+  fd.append('published', '1');
+  const res = await staff.post('/staff/machinery', fd);
+  const id = Number(res.location.match(/\/(\d+)\/edit/)[1]);
+
+  const rentals = await visitor.get('/rentals');
+  assert.match(rentals.body, /Liebherr Mobile Crane/);
+  assert.match(rentals.body, /AED 1,500<\/strong> \/ day/);
+  assert.doesNotMatch((await visitor.get('/machinery')).body, /Liebherr/, 'rent-only machines are not in For sale');
+  const detail = await visitor.get('/machinery/liebherr-mobile-crane');
+  assert.match(detail.body, /Per month/);
+  assert.match(detail.body, /AED 30,000/);
+  assert.match(detail.body, /≈ US\$ 8,169/);
+  assert.match(detail.body, /I&#39;d like to hire/);
+
+  const _csrf = await staff.csrf('/staff/machinery');
+  await staff.post(`/staff/machinery/${id}/status`, { _csrf, status: 'on_rent' });
+  const after = await visitor.get('/rentals');
+  assert.match(after.body, /Liebherr Mobile Crane/, 'machines out on hire stay listed');
+  assert.match(after.body, /badge-on_rent/);
+});
+
 test('drafts are hidden from the public', async () => {
   const fd = new FormData();
   fd.append('_csrf', await staff.csrf('/staff/projects/new'));

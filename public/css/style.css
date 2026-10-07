@@ -136,6 +136,24 @@ form.inline { display: inline-flex; gap: 6px; flex-wrap: wrap; align-items: cent
 .badge-under_offer { background: var(--amber-bg); color: var(--amber); }
 .badge-sold { background: var(--red); color: #fff; }
 .badge-ongoing { background: var(--blue-bg); color: var(--blue); }
+.badge-on_rent { background: #ede7fb; color: #5b3aa8; }
+.badge-offer { left: auto; right: 12px; background: var(--dark); color: #fff; }
+.tag-rent { background: #ede7fb; color: #5b3aa8; border-color: #d8ccf5; }
+.btn-rent { color: #5b3aa8; }
+.card-rent { margin: auto 0 4px; font-size: 1.05rem; color: var(--dark); }
+.card-rent strong { font-size: 1.2rem; }
+.card-rent + .card-price { margin-top: 0; }
+.card-rent-secondary { font-size: .9rem; color: var(--ink-2); order: 2; margin: 4px 0 0; }
+.card-rent-secondary strong { font-size: .95rem; }
+.rent-box { border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 8px; padding: 14px 16px; margin: 4px 0 18px; background: #fbf8f1; }
+.rent-title { font-weight: 700; color: var(--dark); margin: 0 0 6px; }
+.rates { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin: 0; }
+.rates dt { font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.rates dd { margin: 0; font-size: 1.25rem; font-weight: 800; color: var(--dark); }
+.rates dd span { display: block; font-size: .8rem; font-weight: 600; color: var(--muted); }
+.offer-choice { display: flex; gap: 20px; flex-wrap: wrap; }
+.section-tight-top { padding-top: 0; }
+[hidden] { display: none !important; }
 .badge-completed { background: var(--dark); color: #fff; }
 .tag { display: inline-block; font-size: .72rem; font-weight: 700; padding: .15em .55em; border-radius: 4px; background: var(--bg-alt); color: var(--ink-2); border: 1px solid var(--line); margin-left: 4px; vertical-align: middle; }
 

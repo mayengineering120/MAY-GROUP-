@@ -24,16 +24,21 @@
         <a href="/staff/<%= cfg.path %>/<%= l.id %>/edit"><strong><%= l.title %></strong></a>
         <% if (!l.published) { %><span class="tag">Draft</span><% } %>
         <% if (l.featured) { %><span class="tag">Featured</span><% } %>
+        <% if (h.forRent(l)) { %><span class="tag tag-rent"><%= OFFER_TYPES[l.offer_type] %></span><% } %>
         <br><span class="small muted"><%= [l.category, l.location].filter(Boolean).join(' · ') %></span>
       </td>
       <td><span class="badge badge-inline badge-<%= l.status %>"><%= STATUS_LABELS[l.status] %></span></td>
-      <td><%= l.price == null ? 'POA' : h.money(l.price, l.price_currency) %><% if (l.price != null && l.price_on_request) { %><br><span class="small muted">shown as POA</span><% } %></td>
+      <td><% if (h.forRent(l) && h.rentRates(l).length) { const r = h.rentRates(l)[0]; %><span class="small"><%= r.main %>/<%= r.period %></span><br><% } %><%= !h.forSale(l) ? '' : l.price == null ? 'POA' : h.money(l.price, l.price_currency) %><% if (l.price != null && l.price_on_request) { %><br><span class="small muted">shown as POA</span><% } %></td>
       <td class="small"><%= h.date(l.updated_at) %></td>
       <td>
         <form method="post" action="/staff/<%= cfg.path %>/<%= l.id %>/status" class="inline">
           <input type="hidden" name="_csrf" value="<%= csrf() %>">
           <% if (l.status !== 'sold') { %>
-            <button class="btn btn-small btn-sold" name="status" value="sold" type="submit">Mark sold</button>
+            <% if (h.forRent(l)) { %>
+              <% if (l.status === 'on_rent') { %><button class="btn btn-small" name="status" value="available" type="submit">Back from rent</button>
+              <% } else { %><button class="btn btn-small btn-rent" name="status" value="on_rent" type="submit">Mark on rent</button><% } %>
+            <% } %>
+            <% if (h.forSale(l)) { %><button class="btn btn-small btn-sold" name="status" value="sold" type="submit">Mark sold</button><% } %>
           <% } else { %>
             <button class="btn btn-small" name="status" value="available" type="submit">Relist</button>
           <% } %>

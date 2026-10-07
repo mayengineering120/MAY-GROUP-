@@ -8,7 +8,8 @@ The company website, with a secure staff portal for managing machinery and proje
 
 **Public website**
 - **Home page** with your tagline, live stats (machines available, projects delivered, items sold), featured machinery and projects
-- **Machinery** listings with *Available / Sold / All* filters, search, categories and photo galleries
+- **Machinery** listings with *For sale / For rent / Sold / All* filters, search, categories and photo galleries
+- **Rentals**: machinery for hire with daily / weekly / monthly rates; machines out on hire show **On rent**
 - **Projects**: projects *for sale*, plus a portfolio of your *ongoing and completed* work
 - **About** and **Contact** pages, built from your company details
 - **Enquiry forms** on every listing and on the Contact page (with spam protection), **emailed to the company inbox**
@@ -20,7 +21,8 @@ The company website, with a secure staff portal for managing machinery and proje
   - **Staff**: add and edit machinery and projects, upload photos, mark items *sold / under offer / available*, handle enquiries
   - **Administrators**: everything above, plus deleting listings, editing company details and managing staff accounts
 - Dashboard with stock counts, open enquiries and recent activity
-- One-click **"Mark sold"** (the sold date is recorded automatically)
+- Each machine can be offered **for sale, for rent, or both**
+- One-click **"Mark sold"** (the sold date is recorded automatically), **"Mark on rent"** and **"Back from rent"**
 - **Draft** listings (unpublished) visible only to staff
 - **Internal notes** on each listing (purchase price, seller, buyer…), never shown publicly
 - Admins can add staff, reset passwords, promote to admin, or disable access instantly

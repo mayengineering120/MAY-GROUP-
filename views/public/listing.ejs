@@ -26,7 +26,17 @@
     <div class="detail-info">
       <h1><%= listing.title %></h1>
       <% if (listing.summary) { %><p class="lead"><%= listing.summary %></p><% } %>
-      <% if (listing.type === 'machinery' || ['available', 'under_offer', 'sold'].includes(listing.status)) { %>
+      <% if (h.forRent(listing) && listing.status !== 'sold') { %>
+        <div class="rent-box">
+          <p class="rent-title">Available for rent<% if (listing.status === 'on_rent') { %> <span class="small muted">(currently on rent, ask us when it's free)</span><% } %></p>
+          <% const rates = h.rentRates(listing); %>
+          <% if (rates.length) { %>
+            <dl class="rates"><% for (const r of rates) { %><div><dt>Per <%= r.period %></dt><dd><%= r.main %><span><%= r.alt %></span></dd></div><% } %></dl>
+          <% } else { %><p class="small">Rental rates on request.</p><% } %>
+        </div>
+      <% } %>
+      <% if ((h.forSale(listing) || listing.status === 'sold') && (listing.type === 'machinery' || ['available', 'under_offer', 'sold'].includes(listing.status))) { %>
+        <% if (h.forRent(listing) && listing.status !== 'sold') { %><p class="rent-title">Buy</p><% } %>
         <p class="price<%= listing.status === 'sold' ? ' is-sold' : '' %>"><%= h.price(listing) %></p>
         <% if (h.priceAlt(listing)) { %><p class="price-alt"><%= h.priceAlt(listing) %></p><% } %>
       <% } %>
@@ -40,7 +50,7 @@
         <% } %>
       </dl>
       <% if (listing.status !== 'sold') { %>
-        <a class="btn btn-primary" href="#enquire">Enquire about this <%= cfg.singular.toLowerCase() %></a>
+        <a class="btn btn-primary" href="#enquire"><%= h.forRent(listing) && !h.forSale(listing) ? 'Enquire about hiring' : `Enquire about this ${cfg.singular.toLowerCase()}` %></a>
         <% const mainPhone = h.phones(company.phone)[0]; if (mainPhone) { %><a class="btn btn-ghost" href="<%= h.telHref(mainPhone) %>">Call <%= mainPhone %></a><% } %>
       <% } %>
     </div>

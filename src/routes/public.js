@@ -9,7 +9,9 @@ const router = express.Router();
 const PER_PAGE = 12;
 
 router.get('/', (req, res) => {
-  const machinery = L.search({ type: 'machinery', statuses: ['available', 'under_offer'], publishedOnly: true, limit: 6 });
+  const [forSale, forRent] = L.FILTERS.machinery;
+  const machinery = L.search({ type: 'machinery', statuses: forSale.statuses, offerTypes: forSale.offerTypes, publishedOnly: true, limit: 6 });
+  const rentals = L.search({ type: 'machinery', statuses: forRent.statuses, offerTypes: forRent.offerTypes, publishedOnly: true, limit: 3 });
   const projects = L.search({
     type: 'project',
     publishedOnly: true,
@@ -19,13 +21,14 @@ router.get('/', (req, res) => {
   const stats = db
     .prepare(
       `SELECT
-         SUM(type = 'machinery' AND status IN ('available','under_offer')) AS machines_available,
+         SUM(type = 'machinery' AND status IN ('available','under_offer') AND offer_type IN ('sale','both')) AS machines_available,
+         SUM(type = 'machinery' AND status IN ('available','under_offer','on_rent') AND offer_type IN ('rent','both')) AS machines_for_rent,
          SUM(status = 'sold') AS sold,
          SUM(type = 'project' AND status IN ('ongoing','completed')) AS projects_delivered
        FROM listings WHERE published = 1`,
     )
     .get();
-  res.render('public/home', { title: null, machinery: machinery.rows, projects: projects.rows, stats });
+  res.render('public/home', { title: null, machinery: machinery.rows, rentals: rentals.rows, projects: projects.rows, stats });
 });
 
 router.get('/about', (req, res) => res.render('public/about', { title: 'About us' }));
@@ -66,16 +69,17 @@ router.post('/contact', verifyCsrf, (req, res) => {
   res.redirect(back);
 });
 
-function listRoute(type) {
+function listRoute(type, defaultFilter) {
   return (req, res) => {
     const filters = L.FILTERS[type];
-    const filter = filters.find((f) => f.key === req.query.status) || filters[0];
+    const filter = filters.find((f) => f.key === (req.query.status || defaultFilter)) || filters[0];
     const page = Math.max(1, parseInt(req.query.page, 10) || 1);
     const q = String(req.query.q || '').trim().slice(0, 100);
     const category = String(req.query.category || '');
     const { rows, total } = L.search({
       type,
       statuses: filter.statuses,
+      offerTypes: filter.offerTypes,
       publishedOnly: true,
       q,
       category,
@@ -83,7 +87,7 @@ function listRoute(type) {
       offset: (page - 1) * PER_PAGE,
     });
     res.render('public/listings', {
-      title: L.TYPES[type].label,
+      title: filter.key === 'rent' ? 'Machinery for rent' : L.TYPES[type].label,
       cfg: L.TYPES[type],
       filters,
       filter,
@@ -121,6 +125,7 @@ function detailRoute(type) {
 }
 
 router.get('/machinery', listRoute('machinery'));
+router.get('/rentals', listRoute('machinery', 'rent'));
 router.get('/machinery/:slug', detailRoute('machinery'));
 router.get('/projects', listRoute('project'));
 router.get('/projects/:slug', detailRoute('project'));

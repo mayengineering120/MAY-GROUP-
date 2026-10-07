@@ -63,16 +63,33 @@
   <% } %>
 
   <fieldset>
-    <legend>Price</legend>
+    <legend><%= cfg.key === 'machinery' ? 'Sale or rent' : 'Price' %></legend>
+    <% if (cfg.key === 'machinery') { %>
+      <div class="offer-choice" role="radiogroup" aria-label="Offer this machine">
+        <% for (const [key, label] of Object.entries(OFFER_TYPES)) { %>
+          <label class="check"><input type="radio" name="offer_type" value="<%= key %>"<%- (listing.offer_type || 'sale') === key ? ' checked' : '' %>> <%= label %></label>
+        <% } %>
+      </div>
+    <% } %>
     <div class="field-row">
-      <label class="field">Price <input name="price" inputmode="decimal" value="<%= listing.price ?? '' %>"></label>
       <label class="field">Currency
         <% const cur = listing.price_currency || company.default_currency || 'AED'; %>
         <select name="price_currency"><% for (const c of h.CURRENCIES) { %><option value="<%= c %>"<%- c === cur ? ' selected' : '' %>><%= h.CURRENCY_LABELS[c] %></option><% } %></select>
       </label>
+    </div>
+    <div class="field-row" data-offer="sale">
+      <label class="field">Sale price <input name="price" inputmode="decimal" value="<%= listing.price ?? '' %>"></label>
       <label class="check"><input type="checkbox" name="price_on_request" value="1"<%- listing.price_on_request ? ' checked' : '' %>> Show “Price on request” instead</label>
     </div>
-    <p class="small muted">The website shows the price in both currencies, converting at the official peg of 1 US$ = <%= h.AED_PER_USD %> AED.</p>
+    <% if (cfg.key === 'machinery') { %>
+    <div class="field-row" data-offer="rent">
+      <label class="field">Rent per day <input name="rent_day" inputmode="decimal" value="<%= listing.rent_day ?? '' %>"></label>
+      <label class="field">Rent per week <input name="rent_week" inputmode="decimal" value="<%= listing.rent_week ?? '' %>"></label>
+      <label class="field">Rent per month <input name="rent_month" inputmode="decimal" value="<%= listing.rent_month ?? '' %>"></label>
+    </div>
+    <p class="small muted" data-offer="rent">Fill in the rental rates you offer; leave a box empty to hide it. With no rates the website shows “Rental rates on request”. Set the status to <strong>On rent</strong> while the machine is out on hire.</p>
+    <% } %>
+    <p class="small muted">The website shows prices in both currencies, converting at the official peg of 1 US$ = <%= h.AED_PER_USD %> AED.</p>
   </fieldset>
 
   <fieldset id="photos">
