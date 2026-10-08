@@ -44,6 +44,7 @@ CREATE TABLE IF NOT EXISTS listings (
   rent_week        REAL,
   rent_month       REAL,
   rent_year        REAL,
+  rent_on_request  INTEGER NOT NULL DEFAULT 0,
   bedrooms         INTEGER,
   bathrooms        INTEGER,
   area             REAL,
@@ -123,6 +124,7 @@ addColumn('rent_day', 'REAL');
 addColumn('rent_week', 'REAL');
 addColumn('rent_month', 'REAL');
 addColumn('rent_year', 'REAL');
+addColumn('rent_on_request', 'INTEGER NOT NULL DEFAULT 0');
 addColumn('bedrooms', 'INTEGER');
 addColumn('bathrooms', 'INTEGER');
 addColumn('area', 'REAL');

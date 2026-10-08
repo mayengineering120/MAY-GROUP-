@@ -193,6 +193,7 @@ function fromForm(type, body) {
     rent_week: rentPeriods.includes('week') ? toPrice(body.rent_week) : null,
     rent_month: rentPeriods.includes('month') ? toPrice(body.rent_month) : null,
     rent_year: rentPeriods.includes('year') ? toPrice(body.rent_year) : null,
+    rent_on_request: rentPeriods.length && body.rent_on_request ? 1 : 0,
     bedrooms: type === 'property' ? toInt(body.bedrooms) : null,
     bathrooms: type === 'property' ? toInt(body.bathrooms) : null,
     area: type === 'property' ? toPrice(body.area) : null,
@@ -216,7 +217,7 @@ function fromForm(type, body) {
 
 const FIELDS = [
   'title', 'category', 'status', 'published', 'featured', 'summary', 'description', 'location', 'price',
-  'price_currency', 'price_on_request', 'offer_type', 'rent_day', 'rent_week', 'rent_month', 'rent_year', 'bedrooms', 'bathrooms', 'area', 'make', 'model', 'year', 'hours', 'condition', 'client', 'completed_on', 'internal_notes',
+  'price_currency', 'price_on_request', 'offer_type', 'rent_day', 'rent_week', 'rent_month', 'rent_year', 'rent_on_request', 'bedrooms', 'bathrooms', 'area', 'make', 'model', 'year', 'hours', 'condition', 'client', 'completed_on', 'internal_notes',
 ];
 
 function create(type, data, userId) {

@@ -44,8 +44,12 @@ function forRent(listing) {
   return RENTABLE.includes(listing.type) && (listing.offer_type === 'rent' || listing.offer_type === 'both');
 }
 
-/** Rental rates that have been filled in: [{ period: 'day', main: 'AED 1,500', alt: '≈ US$ 408' }, ...] */
-function rentRates(listing) {
+/**
+ * Rental rates that have been filled in: [{ period: 'day', main: 'AED 1,500', alt: '≈ US$ 408' }, ...].
+ * Empty when the rates are set to "on request", unless includeHidden (staff pages).
+ */
+function rentRates(listing, includeHidden = false) {
+  if (listing.rent_on_request && !includeHidden) return [];
   const currency = listing.price_currency || 'AED';
   return ['day', 'week', 'month', 'year']
     .map((period) => [`rent_${period}`, period])

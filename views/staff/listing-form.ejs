@@ -98,6 +98,7 @@
         <label class="field">Rent per <%= period %> <input name="rent_<%= period %>" inputmode="decimal" value="<%= listing[`rent_${period}`] ?? '' %>"></label>
       <% } %>
     </div>
+    <label class="check" data-offer="rent"><input type="checkbox" name="rent_on_request" value="1"<%- listing.rent_on_request ? ' checked' : '' %>> Show “Rental rates on request” instead (the rates above stay visible to staff only)</label>
     <p class="small muted" data-offer="rent">Fill in the rental rates you offer; leave a box empty to hide it. With no rates the website shows “Rental rates on request”.
       <% if (cfg.key === 'machinery') { %>Set the status to <strong>On rent</strong> while the machine is out on hire.<% } else { %>Set the status to <strong>Rented</strong> once a tenant moves in.<% } %></p>
     <% } %>

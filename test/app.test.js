@@ -230,6 +230,25 @@ test('real estate: properties for sale and rent, with property details', async (
   assert.match(rented.body, /badge-rented/);
 });
 
+test('rental rates can be hidden as "on request" while staff still see them', async () => {
+  const fd = new FormData();
+  fd.append('_csrf', await staff.csrf('/staff/real-estate/new'));
+  fd.append('title', 'Office Business Bay');
+  fd.append('offer_type', 'rent');
+  fd.append('rent_year', '123456');
+  fd.append('rent_on_request', '1');
+  fd.append('published', '1');
+  const res = await staff.post('/staff/real-estate', fd);
+  const id = Number(res.location.match(/\/(\d+)\/edit/)[1]);
+  for (const page of ['/real-estate?status=rent', '/real-estate/office-business-bay']) {
+    const body = (await visitor.get(page)).body;
+    assert.match(body, /Rental rates on request/, page);
+    assert.doesNotMatch(body, /123,456|123456/, `${page} must not leak the hidden rate`);
+  }
+  assert.match((await staff.get('/staff/real-estate')).body, /AED 123,456\/year <span class="muted">\(shown as on request\)/);
+  assert.match((await staff.get(`/staff/real-estate/${id}/edit`)).body, /name="rent_year" inputmode="decimal" value="123456"/);
+});
+
 test('drafts are hidden from the public', async () => {
   const fd = new FormData();
   fd.append('_csrf', await staff.csrf('/staff/projects/new'));
