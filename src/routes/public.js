@@ -32,6 +32,12 @@ router.get('/', (req, res) => {
   res.render('public/home', { title: null, machinery: machinery.rows, rentals: rentals.rows, properties: properties.rows, projects: projects.rows, stats });
 });
 
+// Google Search Console "HTML file" verification files (one per verified web address).
+const GOOGLE_VERIFICATION_FILES = ['google750a351f021576fc.html'];
+for (const file of GOOGLE_VERIFICATION_FILES) {
+  router.get(`/${file}`, (req, res) => res.type('text/html').send(`google-site-verification: ${file}`));
+}
+
 // Search engines: which pages to crawl, and a list of every public page.
 router.get('/robots.txt', (req, res) => {
   res.type('text/plain').send(`User-agent: *\nDisallow: /staff\n\nSitemap: ${res.locals.siteUrl}/sitemap.xml\n`);

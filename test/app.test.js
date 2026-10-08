@@ -297,6 +297,12 @@ test('the Google Search Console verification tag is on the site by default', asy
   assert.match((await visitor.get('/')).body, /<meta name="google-site-verification" content="U8PTb60tKA2z4aFeILfI75LvMjoYAQfW6cKGG-M17Is">/);
 });
 
+test('serves the Google Search Console HTML verification file', async () => {
+  const res = await visitor.get('/google750a351f021576fc.html');
+  assert.strictEqual(res.status, 200);
+  assert.strictEqual(res.body, 'google-site-verification: google750a351f021576fc.html');
+});
+
 test('admin can paste the Google Search Console verification tag', async () => {
   const _csrf = await admin.csrf('/staff/company');
   const tag = '<meta name="google-site-verification" content="AbC123_xyz-987654321" />';
