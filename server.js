@@ -25,6 +25,21 @@ app.use((req, res, next) => {
 // Health check for the hosting platform (no session or database work).
 app.get('/healthz', (req, res) => res.type('text').send('ok'));
 
+// Once SITE_URL is the company's own domain, send visitors from the old *.onrender.com address there
+// (permanent redirect, so Google and old links move to the new address).
+const canonicalSite = (() => {
+  try {
+    const url = new URL(process.env.SITE_URL || '');
+    return url.hostname.endsWith('.onrender.com') ? null : url;
+  } catch {
+    return null;
+  }
+})();
+app.use((req, res, next) => {
+  if (canonicalSite && req.hostname.endsWith('.onrender.com')) return res.redirect(301, canonicalSite.origin + req.originalUrl);
+  next();
+});
+
 app.use('/static', express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
 app.use('/uploads', express.static(UPLOAD_DIR, { maxAge: '7d', fallthrough: false }));
 app.use(express.urlencoded({ extended: false, limit: '200kb' }));

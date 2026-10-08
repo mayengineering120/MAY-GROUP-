@@ -302,6 +302,12 @@ test('admin can paste the Google Search Console verification tag', async () => {
   const tag = '<meta name="google-site-verification" content="AbC123_xyz-987654321" />';
   await admin.post('/staff/company', { _csrf, google_site_verification: tag });
   assert.match((await visitor.get('/')).body, /<meta name="google-site-verification" content="AbC123_xyz-987654321">/);
+  // Several codes (e.g. old and new web address) can be kept side by side.
+  await admin.post('/staff/company', { _csrf, google_site_verification: `${tag} <meta name="google-site-verification" content="NewDomain_code-1234567" />` });
+  const both = (await visitor.get('/')).body;
+  assert.match(both, /content="AbC123_xyz-987654321"/);
+  assert.match(both, /content="NewDomain_code-1234567"/);
+  await admin.post('/staff/company', { _csrf, google_site_verification: tag });
   await admin.post('/staff/company', { _csrf, google_site_verification: '"><script>alert(1)</script>' });
   const home = (await visitor.get('/')).body;
   assert.doesNotMatch(home, /<script>alert/);
@@ -322,4 +328,37 @@ test('disabling a staff account logs them out immediately', async () => {
   await admin.post(`/staff/users/${samId}`, { _csrf, action: 'disable' });
   const res = await staff.get('/staff');
   assert.match(res.location, /\/staff\/login/);
+});
+
+test('the old onrender.com address forwards to the company domain once SITE_URL is set', async () => {
+  const { spawn } = require('node:child_process');
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'may-redirect-'));
+  const port = 3900 + Math.floor(Math.random() * 90);
+  const child = spawn(process.execPath, ['--disable-warning=ExperimentalWarning', path.join(__dirname, '..', 'server.js')], {
+    env: { ...process.env, DATA_DIR: dir, UPLOAD_DIR: path.join(dir, 'u'), PORT: String(port), SITE_URL: 'https://musbahalyaqootgroup.com' },
+    stdio: 'ignore',
+  });
+  // fetch() can't set a Host header, so use a raw HTTP request.
+  const get = (urlPath, host) =>
+    new Promise((resolve, reject) => {
+      require('node:http')
+        .get({ port, path: urlPath, headers: { host } }, (r) => {
+          r.resume();
+          resolve({ status: r.statusCode, location: r.headers.location });
+        })
+        .on('error', reject);
+    });
+  try {
+    let res;
+    for (let i = 0; i < 50 && !res; i++) {
+      res = await get('/machinery?status=sold', 'may-group-website.onrender.com').catch(() => null);
+      if (!res) await new Promise((r) => setTimeout(r, 100));
+    }
+    assert.strictEqual(res.status, 301);
+    assert.strictEqual(res.location, 'https://musbahalyaqootgroup.com/machinery?status=sold');
+    assert.strictEqual((await get('/', 'musbahalyaqootgroup.com')).status, 200, 'the new domain itself is served normally');
+  } finally {
+    child.kill();
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });

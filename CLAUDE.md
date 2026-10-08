@@ -45,4 +45,6 @@ To look at pages: `npm start`, open http://localhost:3000 (first visit to /staff
 Render blueprint in `render.yaml` (web service + persistent disk at `/var/data`, auto-deploy on push).
 Alternative: Railway (`railway.json` + `Dockerfile`, volume at `/var/data`). Secrets (`SESSION_SECRET`, `SMTP_PASS`)
 are set in the host dashboard; never commit them. Without `SESSION_SECRET` a secret is generated into `DATA_DIR`.
+Own domain: `musbahalyaqootgroup.com` (Namecheap DNS: A `@` → 216.24.57.1, CNAME `www` → may-group-website.onrender.com).
+When `SITE_URL` is set to a non-onrender address, requests to `*.onrender.com` get a 301 to it (see `server.js`).
 This repository is public.
